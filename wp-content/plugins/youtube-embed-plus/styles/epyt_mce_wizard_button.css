@@ -1,0 +1,7 @@
+i.epyt_mce_wizard_button--icon {
+    background: transparent url("../images/btnwizoff.png") no-repeat scroll center center !important;
+}
+
+i.epyt_mce_wizard_button--icon:hover {
+    background-image: url("../images/btnwizon.png") !important;
+}

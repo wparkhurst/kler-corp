@@ -1,0 +1,62 @@
+/**
+ * #.# Editor Styles
+ *
+ * CSS for just Backend enqueued after style.scss
+ * which makes it higher in priority.
+ */
+
+.components-modal__frame.epytblock__modal {
+	position: absolute;
+	top: 25px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 950px;
+	max-width: 90%;
+	height: calc(100vh - 50px);
+	max-height: calc(100vh - 50px);
+
+	.components-modal__header {
+		margin: 0;
+	}
+
+	.components-modal__content {
+		padding: 0;
+	}
+
+	iframe {
+		width: 100%;
+		height: calc(100% - 60px);
+		display: block;
+	}
+}
+
+.epytblock{
+	.components-placeholder__fieldset {
+		max-width: 100%;
+	}
+}
+
+
+/* .epyt-gallery-list {
+	&:before {
+		content: "Preview Only";
+		display: block;
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+		opacity: 0;
+		background-color: #ffffff;
+		z-index: 10000;
+		color: #888888;
+		font-size: 3em;
+		box-sizing: border-box;
+		padding-top: 40px;
+		transition: opacity .1s ease-out;
+	}
+	&:hover:before {
+		opacity: 0.8;
+		transition: opacity .2s ease-out;
+	}
+} */

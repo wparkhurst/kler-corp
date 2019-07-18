@@ -1,0 +1,314 @@
+0000.005 () Opened log file at time: Thu, 18 Jul 2019 17:45:31 +0000 on https://wp.kler
+0000.005 () UpdraftPlus WordPress backup plugin (https://updraftplus.com): 2.11.29.1 WP: 5.2.2 PHP: 5.6.35 (Windows NT LAPTOP-59PO6S4I 10.0 build 17134 (Windows 10) AMD64) MySQL: 5.7.21 Server: Apache/2.4.33 (Win64) OpenSSL/1.1.0g PHP/5.6.35 safe_mode: 0 max_execution_time: 900 memory_limit: 256M (used: 38.8M | 39.3M) multisite: N mcrypt: Y LANG:  ZipArchive::addFile: Y
+0000.005 () Free space on disk containing Updraft's temporary directory: 64402.5 Mb
+0000.007 () Restore job started. Entities to restore: plugins, themes, uploads, db. Restore options: {"updraft_restorer_replacesiteurl":true,"updraft_encryptionphrase":"","updraft_restorer_wpcore_includewpconfig":false}
+0000.046 () Entity: db
+0000.046 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-db.gz, type=db, info=a:0:{}, last_one=)
+0000.046 () Unpacking backup...
+0000.058 () Database successfully unpacked
+0000.063 () Restoring the database (on a large site this can take a long time - if it times out (which can happen if your web hosting company has configured your hosting to limit resources) then you should use a different method, such as phpMyAdmin)...
+0000.064 () Using direct MySQL access; value of use_mysqli is: 1
+0000.066 () Max packet size: 32 Mb
+0000.066 () Entering maintenance mode
+0000.066 () Enabling Maintenance mode&#8230;
+0000.071 () <strong>Backup of:</strong> https://kler.io
+0000.125 () Old table prefix: wp_
+0000.125 () Site information: multisite=0
+0000.127 () New table prefix: wp_
+0000.136 () Restoring table (MyISAM): wp_options
+0000.205 () Restoring prior UD configuration (table: wp_options; keys: 94)
+0000.424 () Elegant themes theme builder plugin data detected: resetting temporary folder
+0000.428 () Search and replacing table: wp_options: rows: 458
+0000.652 () Restoring table (MyISAM): wp_users
+0000.683 () Search and replacing table: wp_users: rows: 4
+0000.686 () Restoring table (MyISAM): wp_usermeta
+0000.717 () Search and replacing table: wp_usermeta: rows: 152
+0000.739 () Restoring table (MyISAM): wp_commentmeta
+0000.755 () Search and replacing table: wp_commentmeta: rows: 0
+0000.755 () Restoring table (MyISAM): wp_comments
+0000.775 () Search and replacing table: wp_comments: rows: 0
+0000.775 () Restoring table (MyISAM): wp_links
+0000.789 () Search and replacing table: wp_links: rows: 0
+0000.789 () Restoring table (MyISAM): wp_postmeta
+0000.961 () Search and replacing table: wp_postmeta: rows: 4
+0000.970 () Restoring table (MyISAM): wp_posts
+0001.504 () Database queries processed: 50 in 1.44 seconds
+0002.210 () Skipping search/replace on GUID column in posts table
+0002.210 () Search and replacing table: wp_posts: rows: 1090
+0002.859 () Restoring table (MyISAM): wp_term_relationships
+0002.873 () Skipping this table: data in this table (wp_term_relationships) should not be search/replaced
+0002.874 () Restoring table (MyISAM): wp_term_taxonomy
+0002.899 () Search and replacing table: wp_term_taxonomy: rows: 8
+0002.902 () Restoring table (MyISAM): wp_termmeta
+0002.918 () Search and replacing table: wp_termmeta: rows: 0
+0002.918 () Restoring table (MyISAM): wp_terms
+0002.938 () Search and replacing table: wp_terms: rows: 8
+0002.940 () Restoring table (MyISAM): wp_yoast_seo_links
+0002.969 () Search and replacing table: wp_yoast_seo_links: rows: 168
+0003.002 () Restoring table (MyISAM): wp_yoast_seo_meta
+0003.043 () Search and replacing table: wp_yoast_seo_meta: rows: 436
+0003.095 () Restoring table (InnoDB): wp_nf3_action_meta
+0003.142 () Search and replacing table: wp_nf3_action_meta: rows: 154
+0003.166 () Restoring table (InnoDB): wp_nf3_actions
+0003.205 () Search and replacing table: wp_nf3_actions: rows: 7
+0003.208 () Restoring table (InnoDB): wp_nf3_chunks
+0003.250 () Search and replacing table: wp_nf3_chunks: rows: 0
+0003.250 () Restoring table (InnoDB): wp_nf3_field_meta
+0003.310 () Search and replacing table: wp_nf3_field_meta: rows: 129
+0003.368 () Restoring table (InnoDB): wp_nf3_fields
+0003.406 () Search and replacing table: wp_nf3_fields: rows: 12
+0003.410 () Restoring table (InnoDB): wp_nf3_form_meta
+0003.462 () Search and replacing table: wp_nf3_form_meta: rows: 116
+0003.485 () Restoring table (InnoDB): wp_nf3_forms
+0003.524 () Search and replacing table: wp_nf3_forms: rows: 2
+0003.526 () Restoring table (InnoDB): wp_nf3_object_meta
+0003.558 () Search and replacing table: wp_nf3_object_meta: rows: 0
+0003.559 () Restoring table (InnoDB): wp_nf3_objects
+0003.595 () Search and replacing table: wp_nf3_objects: rows: 0
+0003.595 () Restoring table (InnoDB): wp_nf3_relationships
+0003.631 () Search and replacing table: wp_nf3_relationships: rows: 0
+0003.631 () Restoring table (InnoDB): wp_nf3_upgrades
+0003.693 () Search and replacing table: wp_nf3_upgrades: rows: 2
+0003.746 () Restoring table (MyISAM): wp_p2p
+0003.759 () Database queries processed: 100 in 3.69 seconds
+0003.762 () Search and replacing table: wp_p2p: rows: 0
+0003.762 () Restoring table (MyISAM): wp_p2pmeta
+0003.780 () Search and replacing table: wp_p2pmeta: rows: 0
+0003.780 () Restoring table (MyISAM): wp_redirection_404
+0003.857 () Search and replacing table: wp_redirection_404: rows: 687
+0004.035 () Restoring table (MyISAM): wp_redirection_groups
+0004.061 () Search and replacing table: wp_redirection_groups: rows: 2
+0004.062 () Restoring table (MyISAM): wp_redirection_items
+0004.089 () Search and replacing table: wp_redirection_items: rows: 18
+0004.097 () Restoring table (MyISAM): wp_redirection_logs
+0004.115 () Skipping this table: data in this table (wp_redirection_logs) should not be search/replaced
+0004.115 () Restoring table (MyISAM): wp_revslider_css
+0004.146 () Search and replacing table: wp_revslider_css: rows: 109
+0004.271 () Restoring table (MyISAM): wp_revslider_layer_animations
+0004.286 () Search and replacing table: wp_revslider_layer_animations: rows: 0
+0004.286 () Restoring table (MyISAM): wp_revslider_navigations
+0004.301 () Search and replacing table: wp_revslider_navigations: rows: 0
+0004.301 () Restoring table (MyISAM): wp_revslider_sliders
+0004.326 () Search and replacing table: wp_revslider_sliders: rows: 6
+0004.373 () Restoring table (MyISAM): wp_revslider_slides
+0004.422 () Search and replacing table: wp_revslider_slides: rows: 18
+0005.064 () Restoring table (MyISAM): wp_revslider_static_slides
+0005.084 () Search and replacing table: wp_revslider_static_slides: rows: 0
+0005.084 () Restoring table (MyISAM): wp_stw_error_log
+0005.105 () Search and replacing table: wp_stw_error_log: rows: 1
+0005.106 () Restoring table (InnoDB): wp_w3tc_cdn_pathmap
+0005.144 () Search and replacing table: wp_w3tc_cdn_pathmap: rows: 0
+0005.144 () Restoring table (InnoDB): wp_w3tc_cdn_queue
+0005.202 () Search and replacing table: wp_w3tc_cdn_queue: rows: 11
+0005.206 () Restoring table (MyISAM): wp_wc_download_log
+0005.221 () Search and replacing table: wp_wc_download_log: rows: 0
+0005.221 () Restoring table (MyISAM): wp_wc_webhooks
+0005.235 () Search and replacing table: wp_wc_webhooks: rows: 0
+0005.235 () Restoring table (MyISAM): wp_wfblockediplog
+0005.255 () Search and replacing table: wp_wfblockediplog: rows: 1
+0005.256 () Restoring table (MyISAM): wp_wfblocks7
+0005.271 () Search and replacing table: wp_wfblocks7: rows: 0
+0005.271 () Restoring table (MyISAM): wp_wfconfig
+0005.313 () Database queries processed: 150 in 5.25 seconds
+0005.322 () Search and replacing table: wp_wfconfig: rows: 264
+0005.389 () Restoring table (MyISAM): wp_wfcrawlers
+0005.403 () Search and replacing table: wp_wfcrawlers: rows: 0
+0005.403 () Restoring table (MyISAM): wp_wffilechanges
+0005.417 () Search and replacing table: wp_wffilechanges: rows: 0
+0005.417 () Restoring table (MyISAM): wp_wffilemods
+0006.083 () Search and replacing table: wp_wffilemods: rows: 9287
+0007.547 () Searching and replacing reached row: 5000
+0008.789 () Restoring table (MyISAM): wp_wfhits
+0008.826 () Search and replacing table: wp_wfhits: rows: 167
+0008.946 () Restoring table (MyISAM): wp_wfhoover
+0008.961 () Search and replacing table: wp_wfhoover: rows: 0
+0008.961 () Restoring table (MyISAM): wp_wfissues
+0008.994 () Search and replacing table: wp_wfissues: rows: 8
+0009.000 () Restoring table (MyISAM): wp_wfknownfilelist
+0009.512 () Search and replacing table: wp_wfknownfilelist: rows: 9287
+0010.056 () Searching and replacing reached row: 5000
+0010.522 () Restoring table (MyISAM): wp_wflivetraffichuman
+0010.537 () Search and replacing table: wp_wflivetraffichuman: rows: 0
+0010.537 () Restoring table (MyISAM): wp_wflocs
+0010.565 () Search and replacing table: wp_wflocs: rows: 88
+0010.588 () Restoring table (MyISAM): wp_wflogins
+0010.652 () Search and replacing table: wp_wflogins: rows: 717
+0010.853 () Restoring table (InnoDB): wp_wfls_2fa_secrets
+0010.896 () Search and replacing table: wp_wfls_2fa_secrets: rows: 0
+0010.897 () Restoring table (InnoDB): wp_wfls_settings
+0010.946 () Search and replacing table: wp_wfls_settings: rows: 19
+0010.949 () Restoring table (MyISAM): wp_wfnotifications
+0010.960 () Database queries processed: 200 in 10.90 seconds
+0010.978 () Search and replacing table: wp_wfnotifications: rows: 61
+0011.007 () Restoring table (MyISAM): wp_wfpendingissues
+0011.026 () Search and replacing table: wp_wfpendingissues: rows: 0
+0011.026 () Restoring table (MyISAM): wp_wfreversecache
+0011.047 () Search and replacing table: wp_wfreversecache: rows: 2
+0011.049 () Restoring table (MyISAM): wp_wfsnipcache
+0011.069 () Search and replacing table: wp_wfsnipcache: rows: 1
+0011.070 () Restoring table (MyISAM): wp_wfstatus
+0011.252 () Search and replacing table: wp_wfstatus: rows: 2605
+0011.738 () Restoring table (MyISAM): wp_wftrafficrates
+0011.755 () Search and replacing table: wp_wftrafficrates: rows: 0
+0011.755 () Restoring table (MyISAM): wp_woocommerce_api_keys
+0011.768 () Search and replacing table: wp_woocommerce_api_keys: rows: 0
+0011.768 () Restoring table (MyISAM): wp_woocommerce_attribute_taxonomies
+0011.782 () Search and replacing table: wp_woocommerce_attribute_taxonomies: rows: 0
+0011.783 () Restoring table (MyISAM): wp_woocommerce_downloadable_product_permissions
+0011.797 () Search and replacing table: wp_woocommerce_downloadable_product_permissions: rows: 0
+0011.798 () Restoring table (MyISAM): wp_woocommerce_log
+0011.812 () Search and replacing table: wp_woocommerce_log: rows: 0
+0011.812 () Restoring table (MyISAM): wp_woocommerce_order_itemmeta
+0011.826 () Search and replacing table: wp_woocommerce_order_itemmeta: rows: 0
+0011.826 () Restoring table (MyISAM): wp_woocommerce_order_items
+0011.838 () Skipping this table: data in this table (wp_woocommerce_order_items) should not be search/replaced
+0011.838 () Restoring table (MyISAM): wp_woocommerce_payment_tokenmeta
+0011.850 () Search and replacing table: wp_woocommerce_payment_tokenmeta: rows: 0
+0011.850 () Restoring table (MyISAM): wp_woocommerce_payment_tokens
+0011.864 () Search and replacing table: wp_woocommerce_payment_tokens: rows: 0
+0011.865 () Restoring table (MyISAM): wp_woocommerce_sessions
+0011.888 () Search and replacing table: wp_woocommerce_sessions: rows: 37
+0011.923 () Restoring table (MyISAM): wp_woocommerce_shipping_zone_locations
+0011.938 () Search and replacing table: wp_woocommerce_shipping_zone_locations: rows: 0
+0011.938 () Restoring table (MyISAM): wp_woocommerce_shipping_zone_methods
+0011.955 () Search and replacing table: wp_woocommerce_shipping_zone_methods: rows: 0
+0011.955 () Restoring table (MyISAM): wp_woocommerce_shipping_zones
+0011.970 () Search and replacing table: wp_woocommerce_shipping_zones: rows: 0
+0011.970 () Restoring table (MyISAM): wp_woocommerce_tax_rate_locations
+0011.988 () Search and replacing table: wp_woocommerce_tax_rate_locations: rows: 0
+0011.988 () Restoring table (MyISAM): wp_woocommerce_tax_rates
+0012.000 () Unlocking database and leaving maintenance mode
+0012.001 () Disabling Maintenance mode&#8230;
+0012.004 () Search and replacing table: wp_woocommerce_tax_rates: rows: 0
+0012.004 () Finished: lines processed: 248 in 11.94 seconds
+0012.005 () Cleaning up rubbish...
+0012.005 () Begin search and replace (updraftplus_restored_db)
+0012.007 () Restored pre-migration site ID for this installation
+0012.012 () Warning: the database's home URL (https://wp.kler) is different to what we expected (https://kler.io)
+0012.012 () Database search and replace: replace https://kler.io in backup dump with https://wp.kler
+0012.015 () Search and replacing table: wp_commentmeta: already done
+0012.015 () Search and replacing table: wp_comments: already done
+0012.015 () Search and replacing table: wp_links: already done
+0012.015 () Search and replacing table: wp_nf3_action_meta: already done
+0012.015 () Search and replacing table: wp_nf3_actions: already done
+0012.015 () Search and replacing table: wp_nf3_chunks: already done
+0012.015 () Search and replacing table: wp_nf3_field_meta: already done
+0012.015 () Search and replacing table: wp_nf3_fields: already done
+0012.015 () Search and replacing table: wp_nf3_form_meta: already done
+0012.015 () Search and replacing table: wp_nf3_forms: already done
+0012.015 () Search and replacing table: wp_nf3_object_meta: already done
+0012.015 () Search and replacing table: wp_nf3_objects: already done
+0012.015 () Search and replacing table: wp_nf3_relationships: already done
+0012.015 () Search and replacing table: wp_nf3_upgrades: already done
+0012.015 () Search and replacing table: wp_options: already done
+0012.015 () Search and replacing table: wp_p2p: already done
+0012.016 () Search and replacing table: wp_p2pmeta: already done
+0012.016 () Search and replacing table: wp_postmeta: already done
+0012.016 () Search and replacing table: wp_posts: already done
+0012.016 () Search and replacing table: wp_redirection_404: already done
+0012.016 () Search and replacing table: wp_redirection_groups: already done
+0012.016 () Search and replacing table: wp_redirection_items: already done
+0012.016 () Search and replacing table: wp_redirection_logs: already done
+0012.016 () Search and replacing table: wp_revslider_css: already done
+0012.016 () Search and replacing table: wp_revslider_layer_animations: already done
+0012.016 () Search and replacing table: wp_revslider_navigations: already done
+0012.016 () Search and replacing table: wp_revslider_sliders: already done
+0012.016 () Search and replacing table: wp_revslider_slides: already done
+0012.016 () Search and replacing table: wp_revslider_static_slides: already done
+0012.016 () Search and replacing table: wp_stw_error_log: already done
+0012.016 () Search and replacing table: wp_term_relationships: already done
+0012.016 () Search and replacing table: wp_term_taxonomy: already done
+0012.017 () Search and replacing table: wp_termmeta: already done
+0012.017 () Search and replacing table: wp_terms: already done
+0012.017 () Search and replacing table: wp_usermeta: already done
+0012.017 () Search and replacing table: wp_users: already done
+0012.017 () Search and replacing table: wp_w3tc_cdn_pathmap: already done
+0012.017 () Search and replacing table: wp_w3tc_cdn_queue: already done
+0012.017 () Search and replacing table: wp_wc_download_log: already done
+0012.017 () Search and replacing table: wp_wc_webhooks: already done
+0012.017 () Search and replacing table: wp_wfblockediplog: already done
+0012.017 () Search and replacing table: wp_wfblocks7: already done
+0012.017 () Search and replacing table: wp_wfconfig: already done
+0012.017 () Search and replacing table: wp_wfcrawlers: already done
+0012.017 () Search and replacing table: wp_wffilechanges: already done
+0012.017 () Search and replacing table: wp_wffilemods: already done
+0012.017 () Search and replacing table: wp_wfhits: already done
+0012.017 () Search and replacing table: wp_wfhoover: already done
+0012.018 () Search and replacing table: wp_wfissues: already done
+0012.018 () Search and replacing table: wp_wfknownfilelist: already done
+0012.018 () Search and replacing table: wp_wflivetraffichuman: already done
+0012.018 () Search and replacing table: wp_wflocs: already done
+0012.018 () Search and replacing table: wp_wflogins: already done
+0012.018 () Search and replacing table: wp_wfls_2fa_secrets: already done
+0012.018 () Search and replacing table: wp_wfls_settings: already done
+0012.018 () Search and replacing table: wp_wfnotifications: already done
+0012.018 () Search and replacing table: wp_wfpendingissues: already done
+0012.018 () Search and replacing table: wp_wfreversecache: already done
+0012.018 () Search and replacing table: wp_wfsnipcache: already done
+0012.018 () Search and replacing table: wp_wfstatus: already done
+0012.018 () Search and replacing table: wp_wftrafficrates: already done
+0012.018 () Search and replacing table: wp_woocommerce_api_keys: already done
+0012.018 () Search and replacing table: wp_woocommerce_attribute_taxonomies: already done
+0012.018 () Search and replacing table: wp_woocommerce_downloadable_product_permissions: already done
+0012.019 () Search and replacing table: wp_woocommerce_log: already done
+0012.019 () Search and replacing table: wp_woocommerce_order_itemmeta: already done
+0012.019 () Search and replacing table: wp_woocommerce_order_items: already done
+0012.019 () Search and replacing table: wp_woocommerce_payment_tokenmeta: already done
+0012.019 () Search and replacing table: wp_woocommerce_payment_tokens: already done
+0012.019 () Search and replacing table: wp_woocommerce_sessions: already done
+0012.019 () Search and replacing table: wp_woocommerce_shipping_zone_locations: already done
+0012.019 () Search and replacing table: wp_woocommerce_shipping_zone_methods: already done
+0012.019 () Search and replacing table: wp_woocommerce_shipping_zones: already done
+0012.019 () Search and replacing table: wp_woocommerce_tax_rate_locations: already done
+0012.019 () Search and replacing table: wp_woocommerce_tax_rates: already done
+0012.019 () Search and replacing table: wp_yoast_seo_links: already done
+0012.019 () Search and replacing table: wp_yoast_seo_meta: already done
+0012.027 () Entity: plugins
+0012.027 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-plugins.zip, type=plugins, info=a:2:{s:4:"path";s:42:"C:\wamp64\sites\io.kler/wp-content/plugins";s:11:"description";s:7:"Plugins";}, last_one=)
+0012.027 () Unpacking backup... (backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-plugins.zip, 26.3 Mb)
+0076.550 () Moving old data: filesystem method / updraft_dir is potentially possible
+0076.550 () Moving old data: can potentially use wp_filesystem method / -old
+0076.551 () Moving old data out of the way...
+0077.436 () Top-level entities being moved: akismet, hello.php, index.php, really-simple-ssl, updraftplus
+0077.443 () Moving unpacked backup into place...
+0080.304 () Top-level entities being moved: a3-lazy-load, accessible-divi, antispam-bee, cache-enabler, cdn-enabler, classic-editor, coming-soon, cookie-law-info, disable-comments, divi-breadcrumbs-module, divi-fontawesome-gtm, duplicate-post, gtmetrix-for-wordpress, index.php, jetpack, really-simple-ssl, redirection, resmushit-image-optimizer, static-html-output-plugin, updraftplus, us-map, w3-total-cache, wordfence, wordpress-seo, worker, youtube-embed-plus
+0080.345 () Cleaning up rubbish...
+0080.346 () Disabled this plugin: W3 Total Cache: re-activate it manually when you are ready.
+0080.348 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-plugins2.zip, type=plugins, info=a:2:{s:4:"path";s:42:"C:\wamp64\sites\io.kler/wp-content/plugins";s:11:"description";s:7:"Plugins";}, last_one=)
+0080.348 () Unpacking backup... (backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-plugins2.zip, 11.9 Mb)
+0103.434 () Moving unpacked backup into place...
+0104.283 () Top-level entities being moved: wordfence, wordpress-seo, worker, youtube-embed-plus
+0105.748 () Cleaning up rubbish...
+0105.749 () Disabled this plugin: W3 Total Cache: re-activate it manually when you are ready.
+0105.752 () Entity: themes
+0105.752 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-themes.zip, type=themes, info=a:2:{s:4:"path";s:41:"C:\wamp64\sites\io.kler/wp-content/themes";s:11:"description";s:6:"Themes";}, last_one=)
+0105.753 () Unpacking backup... (backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-themes.zip, 8.5 Mb)
+0117.150 () Moving old data: filesystem method / updraft_dir is potentially possible
+0117.151 () Moving old data: can potentially use wp_filesystem method / -old
+0117.151 () Moving old data out of the way...
+0117.240 () Top-level entities being moved: index.php, twentynineteen, twentyseventeen, twentysixteen
+0117.244 () Moving unpacked backup into place...
+0117.647 () Top-level entities being moved: Divi, index.php, twentynineteen
+0117.652 () Cleaning up rubbish...
+0117.656 () Entity: uploads
+0117.656 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads.zip, type=uploads, info=a:2:{s:4:"path";s:42:"C:\wamp64\sites\io.kler/wp-content/uploads";s:11:"description";s:7:"Uploads";}, last_one=)
+0117.657 () Unpacking backup... (backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads.zip, 24.5 Mb)
+0118.709 () Moving old data: filesystem method / updraft_dir is potentially possible
+0118.709 () Moving old data: can potentially use wp_filesystem method / -old
+0118.710 () Moving old data out of the way...
+0118.714 () Moving unpacked backup into place...
+0118.878 () Cleaning up rubbish...
+0118.880 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads2.zip, type=uploads, info=a:2:{s:4:"path";s:42:"C:\wamp64\sites\io.kler/wp-content/uploads";s:11:"description";s:7:"Uploads";}, last_one=)
+0118.881 () Unpacking backup... (backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads2.zip, 24.9 Mb)
+0119.746 () Moving unpacked backup into place...
+0119.995 () Cleaning up rubbish...
+0119.998 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads3.zip, type=uploads, info=a:2:{s:4:"path";s:42:"C:\wamp64\sites\io.kler/wp-content/uploads";s:11:"description";s:7:"Uploads";}, last_one=)
+0119.998 () Unpacking backup... (backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads3.zip, 24.6 Mb)
+0121.151 () Moving unpacked backup into place...
+0121.570 () Cleaning up rubbish...
+0121.572 () restore_backup(backup_file=backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads4.zip, type=uploads, info=a:2:{s:4:"path";s:42:"C:\wamp64\sites\io.kler/wp-content/uploads";s:11:"description";s:7:"Uploads";}, last_one=1)
+0121.573 () Unpacking backup... (backup_2019-07-16-1536_Klr_Corp_f1119c1b1dea-uploads4.zip, 11.2 Mb)
+0127.794 () Moving unpacked backup into place...
+0128.409 () Cleaning up rubbish...
+0128.419 () Restore successful!
+0128.419 () Restore successful

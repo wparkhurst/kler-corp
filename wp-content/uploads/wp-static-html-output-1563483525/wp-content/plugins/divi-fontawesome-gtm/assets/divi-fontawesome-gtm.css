@@ -1,0 +1,8 @@
+.hide_icon, .hide_icon::before, .hide_icon::after {opacity: 0 !important;}
+body .divi_font_awesome_icon--font-awesome::before, body .divi_font_awesome_icon--font-awesome::after, body .divi_font_awesome_icon--font-awesome.et-pb-icon, body.et-db.divi-font-awesome #et-boc .divi_font_awesome_icon--font-awesome::before, body.et-db.divi-font-awesome #et-boc .divi_font_awesome_icon--font-awesome::after, body.et-db.divi-font-awesome #et-boc .divi_font_awesome_icon--font-awesome.et-pb-icon, body.et-db.divi-font-awesome #et-boc .divi_font_awesome_icon--font-awesome[data-family="font-awesome"]::before, body.et-db.divi-font-awesome #et-boc .divi_font_awesome_icon--font-awesome[data-family="font-awesome"]::after, body.et-db.divi-font-awesome #et-boc .et-fb-font-icon-list li.divi_font_awesome_icon--font-awesome::before, body.et-db.divi-font-awesome #et-boc .et-fb-font-icon-list li.divi_font_awesome_icon--font-awesome::after {font-family: "FontAwesome" !important;}
+.et_font_icon li.divi_font_awesome_icon--font-awesome {font-size: 18px;}
+.gtm_dfa_settings {background: #fff;padding: 10px 15px;border-right: 2px solid #e5e5e5;border-bottom: 2px solid #e5e5e5;}
+.gtm_dfa_settings_label_icon::before {padding-right: 10px;color: #ccc;}
+.gtm_dfa_settings_label_icon--unlocked::before {color: #1abc9c;}
+.gtm_dfa_settings input {width: 25em;}
+.gtm_dfa_credits {display: block;text-align: center;color: #888;font-size: .9em;}

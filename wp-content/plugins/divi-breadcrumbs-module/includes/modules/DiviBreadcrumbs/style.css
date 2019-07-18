@@ -1,0 +1,9 @@
+/* Module Selection Button */
+li.et_fb_dcsbcm_divi_breadcrumbs_module {
+    background-color: #7f3266 !important;
+    color: #fff !important;
+}
+li.et_fb_dcsbcm_divi_breadcrumbs_module:hover {
+    background-color: #89366e !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
