@@ -2,7 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://kler.io/</loc>
-		<lastmod>2019-08-05T13:03:24-07:00</lastmod>
+		<lastmod>2019-08-06T11:06:12-07:00</lastmod>
 		<image:image>
 			<image:loc>https://kler.io/wp-content/uploads/2019/06/KlerProjects512.png</image:loc>
 		</image:image>
@@ -57,20 +57,12 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://kler.io/features/</loc>
-		<lastmod>2018-11-21T14:49:56-07:00</lastmod>
-	</url>
-	<url>
 		<loc>https://kler.io/partners/</loc>
 		<lastmod>2018-11-21T15:05:04-07:00</lastmod>
 	</url>
 	<url>
 		<loc>https://kler.io/privacy-policy/</loc>
 		<lastmod>2018-12-03T10:57:58-07:00</lastmod>
-	</url>
-	<url>
-		<loc>https://kler.io/company/compliance/</loc>
-		<lastmod>2019-01-15T13:26:16-07:00</lastmod>
 	</url>
 	<url>
 		<loc>https://kler.io/features/cart/</loc>
@@ -90,28 +82,8 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://kler.io/request-submitted/</loc>
-		<lastmod>2019-06-19T16:21:53-07:00</lastmod>
-	</url>
-	<url>
 		<loc>https://kler.io/terms/</loc>
 		<lastmod>2019-06-19T16:23:30-07:00</lastmod>
-	</url>
-	<url>
-		<loc>https://kler.io/support/knowledge-base/</loc>
-		<lastmod>2019-06-19T16:28:39-07:00</lastmod>
-	</url>
-	<url>
-		<loc>https://kler.io/features/wholesale/</loc>
-		<lastmod>2019-06-20T15:09:43-07:00</lastmod>
-	</url>
-	<url>
-		<loc>https://kler.io/features/security/</loc>
-		<lastmod>2019-06-20T15:11:04-07:00</lastmod>
-	</url>
-	<url>
-		<loc>https://kler.io/features/reporting-data/</loc>
-		<lastmod>2019-06-20T15:12:38-07:00</lastmod>
 	</url>
 	<url>
 		<loc>https://kler.io/company/</loc>
@@ -131,13 +103,6 @@
 		<image:image>
 			<image:loc>https://kler.io/wp-content/uploads/2019/02/weedware-implementation-1902.png</image:loc>
 			<image:caption><![CDATA[WeedWare Development Process]]></image:caption>
-		</image:image>
-	</url>
-	<url>
-		<loc>https://kler.io/features/grow/</loc>
-		<lastmod>2019-06-27T16:32:34-07:00</lastmod>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/06/grow.png</image:loc>
 		</image:image>
 	</url>
 	<url>
@@ -184,41 +149,12 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://kler.io/features/pos/</loc>
-		<lastmod>2019-06-28T17:44:07-07:00</lastmod>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/06/POS-SS-1.png</image:loc>
-		</image:image>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/06/WeedWareAndroidProducts.png</image:loc>
-		</image:image>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/06/WeedWareAndroidPayment.png</image:loc>
-		</image:image>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/06/disco-ss-2.png</image:loc>
-		</image:image>
-	</url>
-	<url>
-		<loc>https://kler.io/support/</loc>
-		<lastmod>2019-07-01T06:58:00-07:00</lastmod>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/07/kler-knowledge-baset.png</image:loc>
-		</image:image>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/07/kler-support.png</image:loc>
-		</image:image>
-		<image:image>
-			<image:loc>https://kler.io/wp-content/uploads/2019/02/teamviewer.png</image:loc>
-		</image:image>
-	</url>
-	<url>
 		<loc>https://kler.io/company/contact-us/</loc>
 		<lastmod>2019-07-01T08:20:36-07:00</lastmod>
 	</url>
 	<url>
 		<loc>https://kler.io/cbd/</loc>
-		<lastmod>2019-07-18T12:41:57-07:00</lastmod>
+		<lastmod>2019-08-06T11:08:36-07:00</lastmod>
 		<image:image>
 			<image:loc>https://kler.io/wp-content/uploads/2019/06/KlerCBDIcon256.png</image:loc>
 		</image:image>
@@ -240,7 +176,7 @@
 	</url>
 	<url>
 		<loc>https://kler.io/thc/</loc>
-		<lastmod>2019-07-18T12:42:04-07:00</lastmod>
+		<lastmod>2019-08-06T11:09:22-07:00</lastmod>
 		<image:image>
 			<image:loc>https://kler.io/wp-content/uploads/2019/06/KlerTHCIcon256.png</image:loc>
 		</image:image>
@@ -258,12 +194,76 @@
 		</image:image>
 	</url>
 	<url>
-		<loc>https://kler.io/request-a-demo/</loc>
-		<lastmod>2019-07-18T12:42:17-07:00</lastmod>
+		<loc>https://kler.io/features/pos/</loc>
+		<lastmod>2019-08-06T11:11:26-07:00</lastmod>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/06/POS-SS-1.png</image:loc>
+		</image:image>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/06/WeedWareAndroidProducts.png</image:loc>
+		</image:image>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/06/WeedWareAndroidPayment.png</image:loc>
+		</image:image>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/06/disco-ss-2.png</image:loc>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://kler.io/features/</loc>
+		<lastmod>2019-08-06T11:14:56-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/features/grow/</loc>
+		<lastmod>2019-08-06T11:16:37-07:00</lastmod>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/06/grow.png</image:loc>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://kler.io/features/wholesale/</loc>
+		<lastmod>2019-08-06T11:16:52-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/features/security/</loc>
+		<lastmod>2019-08-06T11:17:36-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/features/reporting-data/</loc>
+		<lastmod>2019-08-06T11:17:53-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/company/compliance/</loc>
+		<lastmod>2019-08-06T11:19:01-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/support/</loc>
+		<lastmod>2019-08-06T11:20:44-07:00</lastmod>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/07/kler-knowledge-baset.png</image:loc>
+		</image:image>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/07/kler-support.png</image:loc>
+		</image:image>
+		<image:image>
+			<image:loc>https://kler.io/wp-content/uploads/2019/02/teamviewer.png</image:loc>
+		</image:image>
 	</url>
 	<url>
 		<loc>https://kler.io/company/contact/</loc>
-		<lastmod>2019-07-18T13:37:09-07:00</lastmod>
+		<lastmod>2019-08-06T11:20:55-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/support/knowledge-base/</loc>
+		<lastmod>2019-08-06T11:23:19-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/request-a-demo/</loc>
+		<lastmod>2019-08-06T11:25:15-07:00</lastmod>
+	</url>
+	<url>
+		<loc>https://kler.io/request-submitted/</loc>
+		<lastmod>2019-08-06T11:25:26-07:00</lastmod>
 	</url>
 </urlset>
 <!-- XML Sitemap generated by Yoast SEO -->
