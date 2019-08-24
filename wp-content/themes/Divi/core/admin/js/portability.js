@@ -69,7 +69,7 @@
 			$el.find( '[data-et-core-portability-cancel]' ).click( function( e ) {
 				e.preventDefault();
 				$this.cancel();
-			} )
+			} );
 		},
 
 		validateImportFile: function( file, noOutput ) {
@@ -124,9 +124,14 @@
 				return;
 			}
 
+			var includeCustomDefaults = $this.instance('[name="et-core-portability-import-include-custom-defaults"]').is(':checked');
+			var applyCustomDefaults   = $this.instance('[name="et-core-portability-import-apply-custom-defaults"]').is(':checked');
+
 			$this.ajaxAction( {
 				action: 'et_core_portability_import',
 				file: file,
+				include_custom_defaults: includeCustomDefaults,
+				apply_custom_defaults: applyCustomDefaults,
 				nonce: $this.nonces.import
 			}, function( response ) {
 				etCore.modalContent( '<div class="et-core-loader et-core-loader-success"></div>', false, 3000, '#et-core-portability-import' );
@@ -253,7 +258,8 @@
 				dataType: 'json',
 				data: {
 					action: 'et_core_portability_export',
-					content: content,
+					content: content.shortcode,
+					custom_defaults: content.custom_defaults,
 					timestamp: timestamp !== undefined ? timestamp : 0,
 					nonce: $this.nonces.export,
 					post: postId,
@@ -324,7 +330,7 @@
 			} );
 		},
 
-		importFB: function( file, postId ) {
+		importFB: function(file, postId, options) {
 			var $this = this;
 			var errorEvent = document.createEvent( 'Event' );
 
@@ -345,10 +351,15 @@
 				return;
 			}
 
+			if ('undefined' === typeof options) {
+				options = {};
+			}
+
 			var fileSize = Math.ceil( ( file.size / ( 1024 * 1024 ) ).toFixed( 2 ) ),
 				formData = new FormData(),
 				requestData = {
 					action: 'et_core_portability_import',
+					include_custom_defaults: options.includeCustomDefaults,
 					file: file,
 					content: false,
 					timestamp: 0,

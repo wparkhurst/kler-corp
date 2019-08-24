@@ -95,6 +95,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 				$et_slide.eq(0).addClass( 'et-pb-active-slide' );
 
+				$et_slider.attr('data-active-slide', $et_slide.data('slide-id'));
+
 				if ( ! settings.tabs_animation ) {
 					if ( !$et_slider.hasClass('et_pb_bg_layout_dark') && !$et_slider.hasClass('et_pb_bg_layout_light') ) {
 						$et_slider.addClass( et_get_bg_layout_color( $et_slide.eq(0) ) );
@@ -178,8 +180,6 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						return false;
 					} );
 				}
-
-				et_maybe_set_controls_color( $et_slide.eq(0) );
 
 				if ( settings.use_carousel && et_slides_number > 1 ) {
 					for ( var i = 1; i <= et_slides_number; i++ ) {
@@ -342,39 +342,6 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					return 'et_pb_bg_layout_dark';
 				}
 
-				function et_maybe_set_controls_color( $slide ) {
-					var next_slide_dot_color,
-						$arrows,
-						arrows_color;
-
-					// Set current slider breakpoint and add suffix.
-					var current_mode     = et_pb_get_current_window_mode();
-					et_slider_breakpoint = current_mode;
-					var suffix           = current_mode !== 'desktop' ? '-' + current_mode : '';
-
-					if ( typeof $et_slider_controls !== 'undefined' && $et_slider_controls.length ) {
-						next_slide_dot_color = $slide.attr( 'data-dots_color' + suffix ) || $slide.attr( 'data-dots_color' ) || '';
-
-						if ( next_slide_dot_color !== '' ) {
-							$et_slider_controls.attr( 'style', 'background-color: ' + hex_to_rgba( next_slide_dot_color, '0.3' ) + ';' );
-							$et_slider_controls.filter( '.et-pb-active-control' ).attr( 'style', 'background-color: ' + hex_to_rgba( next_slide_dot_color ) + '!important;' );
-						} else {
-							$et_slider_controls.removeAttr( 'style' );
-						}
-					}
-
-					if ( typeof $et_slider_arrows !== 'undefined' && $et_slider_arrows.length ) {
-						$arrows      = $et_slider_arrows.find( 'a' );
-						arrows_color = $slide.attr( 'data-arrows_color' + suffix ) || $slide.attr( 'data-arrows_color' ) || '';
-
-						if ( arrows_color !== '' ) {
-							$arrows.attr( 'style', 'color: ' + arrows_color + '!important;' );
-						} else {
-							$arrows.css( 'color', 'inherit' );
-						}
-					}
-				}
-
 				// fix the appearance of some modules inside the post slider
 				function et_fix_builder_content() {
 					if ( is_post_slider ) {
@@ -420,32 +387,29 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 				$et_window.on( 'resize.et_simple_slider', function() {
 					et_fix_slider_height( $et_slider );
-
-					// If mode is changed, reinit animation data.
-					if ( et_pb_get_current_window_mode() !== et_slider_breakpoint && ! isBuilder ) {
-						et_maybe_set_controls_color( $et_slider.find('.et-pb-active-slide') );
-					}
 				} );
 
-				$et_slider.et_slider_move_to = function ( direction ) {
-					var $active_slide = $et_slide.eq( et_active_slide );
+				$et_slider.et_slider_move_to = function (direction) {
+					$et_slide = $et_slider.closest_descendent(settings.slide);
+					var $active_slide = $et_slide.eq(et_active_slide);
 
 					$et_slider.et_animation_running = true;
 
-					$et_slider.removeClass('et_slide_transition_to_next et_slide_transition_to_previous').addClass('et_slide_transition_to_' + direction );
+					$et_slider.removeClass('et_slide_transition_to_next et_slide_transition_to_previous').addClass('et_slide_transition_to_' + direction);
 
 					$et_slider.find('.et-pb-moved-slide').removeClass('et-pb-moved-slide');
 
-					if ( direction == 'next' || direction == 'previous' ){
+					if (direction === 'next' || direction === 'previous'){
 
-						if ( direction == 'next' )
-							et_active_slide = ( et_active_slide + 1 ) < et_slides_number ? et_active_slide + 1 : 0;
-						else
-							et_active_slide = ( et_active_slide - 1 ) >= 0 ? et_active_slide - 1 : et_slides_number - 1;
+						if (direction === 'next') {
+							et_active_slide = (et_active_slide + 1) < et_slides_number ? et_active_slide + 1 : 0;
+						} else {
+							et_active_slide = (et_active_slide - 1) >= 0 ? et_active_slide - 1 : et_slides_number - 1;
+						}
 
 					} else {
 
-						if ( et_active_slide == direction ) {
+						if (et_active_slide === direction) {
 							$et_slider.et_animation_running = false;
 							return;
 						}
@@ -454,11 +418,13 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 					}
 
+					$et_slider.attr('data-active-slide', $et_slide.eq( et_active_slide ).data('slide-id'));
+
 					if (typeof et_slider_timer !== 'undefined') {
 						clearTimeout(et_slider_timer);
 					}
 
-					var $next_slide	= $et_slide.eq( et_active_slide );
+					var $next_slide	= $et_slide.eq(et_active_slide);
 
 					$et_slider.trigger('slide', {current: $active_slide, next: $next_slide});
 
@@ -521,8 +487,6 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						$et_slider_carousel_controls.removeClass( settings.control_active_class ).eq( et_active_slide ).addClass( settings.control_active_class );
 
 					if ( ! settings.tabs_animation ) {
-						et_maybe_set_controls_color( $next_slide );
-
 						$next_slide.animate( { opacity : 1 }, et_fade_speed );
 						$active_slide.addClass( 'et_slide_transition' ).css( { 'display' : 'list-item', 'opacity' : 1 } ).animate( { opacity : 0 }, et_fade_speed, function(){
 							var active_slide_layout_bg_color = et_get_bg_layout_color( $active_slide ),
@@ -2650,7 +2614,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 			});
 
 			if ( $et_pb_circle_counter.length || is_frontend_builder || $( '.et_pb_ajax_pagination_container' ).length > 0 ) {
-				window.et_pb_circle_counter_init = function($the_counter, animate) {
+				window.et_pb_circle_counter_init = function($the_counter, animate, custom_mode) {
 					if ( $the_counter.width() <= 0 ) {
 						return;
 					}
@@ -2658,7 +2622,15 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					// Update animation breakpoint variable and generate suffix.
 					var current_mode        = et_pb_get_current_window_mode();
 					et_animation_breakpoint = current_mode;
-					var suffix              = current_mode !== 'desktop' ? '-' + current_mode : '';
+
+					// Custom Mode is used to pass custom preview mode such as hover. Current mode is
+					// actual preview mode based on current window size.
+					var suffix = '';
+					if ('undefined' !== typeof custom_mode && '' !== custom_mode) {
+						suffix = '-' + custom_mode;
+					} else if (current_mode !== 'desktop') {
+						suffix = '-' + current_mode;
+					}
 
 					// Update bar background color based on active mode.
 					var bar_color      = $the_counter.data( 'bar-bg-color' );
@@ -2677,7 +2649,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					// Update bar track color alpha based on active mode.
 					var track_color_alpha      = $the_counter.data( 'alpha' ) || '0.1';
 					var mode_track_color_alpha = $the_counter.data( 'alpha' + suffix );
-					if ( typeof mode_track_color_alpha !== 'undefined' && mode_track_color_alpha !== '' ) {
+					if ('undefined' !== typeof mode_track_color_alpha && '' !== mode_track_color_alpha && !isNaN(mode_track_color_alpha)) {
 						track_color_alpha = mode_track_color_alpha;
 					}
 
@@ -2709,17 +2681,77 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						var $the_counter = $(this).find('.et_pb_circle_counter_inner');
 						window.et_pb_circle_counter_init($the_counter, false);
 
-						$the_counter.on('containerWidthChanged', function( event ){
+						// Circle Counter on Hover.
+						$the_counter.on('mouseover', function(event){
+							window.et_pb_circle_counter_update($the_counter, event, 'hover');
+						});
+
+						// Circle Counter on "Unhover" as reset of Hover effect.
+						$the_counter.on('mouseleave', function(event){
+							window.et_pb_circle_counter_update($the_counter, event);
+						});
+
+						$the_counter.on('containerWidthChanged', function(event, custom_mode){
 							$the_counter = $( event.target );
 							$the_counter.find('canvas').remove();
 							$the_counter.removeData('easyPieChart' );
-							window.et_pb_circle_counter_init($the_counter, true);
+							window.et_pb_circle_counter_init($the_counter, true, custom_mode);
 						});
 
 					});
 				};
 				window.et_pb_reinit_circle_counters( $et_pb_circle_counter );
 			}
+
+			/**
+			 * Update circle counter easyPieChart data on custom mode.
+			 *
+			 * @since 3.25.3
+			 *
+			 * @param {jQuery} $this_counter Circle counter jQuery element.
+			 * @param {Object} event         Event object
+			 * @param {String} custom_mode   Custom view mode such as hover/desktop/tablet/phone.
+			 */
+			window.et_pb_circle_counter_update = function($this_counter, event, custom_mode) {
+				if (!$this_counter.is(':visible') || typeof $this_counter.data('easyPieChart') === 'undefined') {
+					return;
+				}
+
+				// Check circle attributes value for current event type.
+				if ($(event.target).length > 0) {
+					if ('mouseover' === event.type || 'mouseleave' === event.type) {
+						has_field_value = false;
+
+						// Check if one of those field value exist.
+						var mode_bar_color         = $this_counter.data('bar-bg-color-hover');
+						var mode_track_color       = $this_counter.data('color-hover');
+						var mode_track_color_alpha = $this_counter.data('alpha-hover');
+
+						if (typeof mode_bar_color !== 'undefined' && mode_bar_color !== '') {
+							has_field_value = true;
+						} else if (typeof mode_track_color !== 'undefined' && mode_track_color !== '') {
+							has_field_value = true;
+						} else if (typeof mode_track_color_alpha !== 'undefined' && mode_track_color_alpha !== '') {
+							has_field_value = true;
+						}
+
+						if (!has_field_value) {
+							return;
+						}
+					}
+				}
+
+				// Reinit circle counter for current event.
+				var container_param = [];
+				if ('undefined' !== typeof custom_mode && '' !== custom_mode) {
+					container_param = [custom_mode];
+				}
+				$this_counter.trigger('containerWidthChanged', container_param);
+
+				// Animation should be disabled here.
+				$this_counter.data('easyPieChart').disableAnimation();
+				$this_counter.data('easyPieChart').update($this_counter.data('number-value'));
+			};
 
 			if ( $et_pb_number_counter.length || is_frontend_builder || $( '.et_pb_ajax_pagination_container' ).length > 0 ) {
 				window.et_pb_reinit_number_counters = function( $et_pb_number_counter ) {
@@ -3062,7 +3094,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 							}
 
 							// add error message for the field if it is required and empty
-							if ('required' === required_mark && ('' === this_val || true === unchecked)) {
+						if ('required' === required_mark && ('' === this_val || true === unchecked) && ! $this_el.is('[id^="et_pb_contact_et_number_"]')) {
 
 								if (false === $this_wrapper) {
 									$this_el.addClass('et_contact_error');
@@ -4050,7 +4082,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				});
 			}
 
-			function et_animate_element( $element ) {
+			function et_animate_element($elementOriginal) {
+				var $element = $elementOriginal;
 				if ($element.hasClass('et_had_animation')) {
 					return;
 				}
@@ -4062,6 +4095,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				var animation_intensity        = $element.attr('data-animation-intensity');
 				var animation_starting_opacity = $element.attr('data-animation-starting-opacity');
 				var animation_speed_curve      = $element.attr('data-animation-speed-curve');
+				var $buttonWrapper             = $element.parent('.et_pb_button_module_wrapper');
 
 				// Avoid horizontal scroll bar when section is rolled
 				if ($element.is('.et_pb_section') && 'roll' === animation_style) {
@@ -4077,6 +4111,12 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				// Check if the animation speed curve is one of the allowed ones and set it to the default one if it is not
 				if ( $.inArray( animation_speed_curve, ['linear', 'ease', 'ease-in', 'ease-out', 'ease-in-out'] ) === -1 ) {
 					animation_speed_curve = 'ease-in-out';
+				}
+
+				if ($buttonWrapper.length > 0) {
+					$element.removeClass('et_animated');
+					$element = $buttonWrapper;
+					$element.addClass('et_animated');
 				}
 
 				$element.css({
@@ -6075,6 +6115,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 	$(window).load(function() {
 		var $body = $('body');
+		// set load event here because safari sometimes will not run load events registered on et_pb_init_modules.
+		window.et_load_event_fired = true;
 		// fix Safari letter-spacing bug when styles applied in `head`
 		// Trigger styles redraw by changing body display property to differentvalue and reverting it back to original.
 		if ($body.hasClass('safari')) {
