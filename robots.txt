@@ -2,5 +2,4 @@ User-agent: *
 Disallow: /wp-admin/
 Allow: /wp-admin/admin-ajax.php
 
-# Sitemap files
 Sitemap: https://kler.io/sitemap.xml
