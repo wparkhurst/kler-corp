@@ -240,6 +240,10 @@ var CLI=
 			{
 				jQuery('.cli-privacy-readmore').show();
 			}
+			else
+			{
+				jQuery('.cli-privacy-readmore').hide();
+			}
 		},
 		truncateText : function( textBlock ) {            
 			while (textBlock.text().length > 250 ) 

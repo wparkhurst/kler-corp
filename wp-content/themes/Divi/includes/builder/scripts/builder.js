@@ -5,13 +5,16 @@ window.wp = window.wp || {};
 /**
  * The builder version and product name will be updated by grunt release task. Do not edit!
  */
-window.et_builder_version = '3.26.6';
+window.et_builder_version = '3.28';
 window.et_builder_product_name = 'Divi';
 
 ( function($) {
 	var et_error_modal_shown = window.et_error_modal_shown,
 		et_is_loading_missing_modules = false,
+		et_is_loading_templates = false,
 		et_pb_bulder_loading_attempts = 0,
+		et_pb_template_requests_number = 0,
+		et_pb_template_requests_completed = 0,
 		et_ls_prefix = 'et_pb_templates_',
 		et_pb_hovered_item_buffer = {},
 		et_pb_all_unsynced_options = {},
@@ -136,6 +139,11 @@ window.et_builder_product_name = 'Divi';
 		}
 
 		if ( et_should_load_from_local_storage() ) {
+			// Wait until templates loading finished to avoid conflict requests.
+			if (et_is_loading_templates) {
+				return;
+			}
+
 			for ( var et_ls_module_index in et_ls_all_modules ) {
 				var et_ls_module_slug      = et_ls_all_modules[ et_ls_module_index ],
 					et_ls_template_slug    = et_ls_prefix + et_ls_module_slug,
@@ -201,8 +209,13 @@ window.et_builder_product_name = 'Divi';
 					clearInterval( et_pb_templates_interval );
 					return false;
 				}
+				
+				et_is_loading_templates = true;
+				
+				// calculate the overall requests number to understand when we finish all the requests.
+				et_pb_template_requests_number++;
 
-				et_pb_append_templates( et_pb_templates_count * et_pb_options.et_builder_templates_amount );
+				et_pb_append_templates(et_pb_templates_count * et_pb_options.et_builder_templates_amount);
 
 				et_pb_templates_count++;
 			}, 800);
@@ -331,6 +344,14 @@ window.et_builder_product_name = 'Divi';
 						}
 
 						$( 'body' ).append( template );
+					}
+
+					et_pb_template_requests_completed++;
+
+					// Run et_builder_load_backbone_templates() once all the requests finished to load all missing templates if any.
+					if (et_pb_template_requests_number > 0 && et_pb_template_requests_number === et_pb_template_requests_completed) {
+						et_is_loading_templates = false;
+						et_builder_load_backbone_templates();
 					}
 				}
 			});
@@ -4443,7 +4464,14 @@ window.et_builder_product_name = 'Divi';
 			className : 'et_pb_module_settings',
 
 			initialize : function() {
-				if ( ! $( ET_PageBuilder_Layout.generateTemplateName( this.attributes['data-module_type'] ) ).length ) {
+				var modulesWithChild  = $.parseJSON(et_pb_options.et_builder_modules_with_children);
+				var moduleType        = this.attributes['data-module_type'];
+				var childTemplateSlug = get(modulesWithChild, moduleType, false);
+				var childTemplateId   = childTemplateSlug ? '#et-builder-advanced-setting-' + childTemplateSlug + '-title' : false;
+				var mainTemplateId    = ET_PageBuilder_Layout.generateTemplateName(this.attributes['data-module_type']);
+
+				// Make sure required child template is loaded along with main template.
+				if ($(mainTemplateId).length < 1 || (childTemplateId && $(childTemplateId).length < 1)) {
 					this.attributes['data-no_template'] = 'no_template';
 					return;
 				}
@@ -5354,7 +5382,9 @@ window.et_builder_product_name = 'Divi';
 			removeView : function( event ) {
 				if ( event ) event.preventDefault();
 
-				this.child_view.remove();
+				if (!_.isUndefined(this.child_view)) {
+					this.child_view.remove();
+				}
 
 				this.remove();
 

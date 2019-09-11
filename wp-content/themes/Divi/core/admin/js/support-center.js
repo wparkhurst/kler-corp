@@ -12,7 +12,7 @@
   var $etSystemStatusTable             = $('.et_system_status');
   var $etSupportUserToggle             = $('.et_support_user_toggle .et_pb_yes_no_button');
   var $et_documentation_videos_list_li = $('.et_documentation_videos_list li');
-  var $modalSafeModeWarningTemplate    = $('#et-ajax-saving-template').html();
+  var $modalSafeModeWarningTemplate    = $('#et-ajax-safe-mode-template').html();
 
   function confirmClipboardCopy() {
     $save_message.addClass('success-animation').fadeIn('fast');
@@ -162,16 +162,25 @@
 
   // Documentation: Recalculate video dimensions (typically on viewport resize)
   function et_core_correct_video_proportions() {
-    var parentHeight = (parseInt(jQuery('.et_docs_videos').first().width()) * .5625) + 'px';
-    jQuery('.et_docs_videos .wrapper').css('max-height', parentHeight);
-    jQuery('.et_docs_videos iframe').css('max-height', parentHeight);
+    var parentHeight = (parseInt($('.et_docs_videos').first().width()) * .5625) + 'px';
+    $('.et_docs_videos .wrapper').css('max-height', parentHeight);
+    $('.et_docs_videos iframe').css('max-height', parentHeight);
   }
 
   // Documentation: Initialize YouTube Iframe player
   function loadYouTubeIframe() {
     if (('undefined' !== typeof YT) && YT && YT.Player) {
+      // Default video: 'Getting Started With The Divi Builder'
+      var firstVideo      = 'T-Oe01_J62c';
+      var $firstVideoItem = $('.et_docs_videos li:first-of-type');
+
+      // If the Documentation videos list has YouTube IDs, grab the first one
+      if ($firstVideoItem.length > 0 && $firstVideoItem[0].hasAttribute('data-ytid')) {
+        firstVideo = $firstVideoItem.attr('data-ytid');
+      }
+
       docPlayer = new YT.Player('et_documentation_player', {
-        videoId:  'T-Oe01_J62c',
+        videoId:  firstVideo,
         height:   '360',
         width:    '640',
         showinfo: 0,
@@ -199,6 +208,23 @@
       return;
     }
 
+    if ('activate' === postData.support_update) {
+      var safeModeProduct = $toggle.parents('#et_card_safe_mode').data('et-product');
+
+      // Continue only if the product is in our whitelist
+      switch (safeModeProduct) {
+        case 'divi_builder_plugin':
+        case 'divi_theme':
+        case 'extra_theme':
+        case 'monarch_plugin':
+        case 'bloom_plugin':
+          postData.product = safeModeProduct;
+          break;
+        default:
+          return;
+      }
+    }
+
     // Ajax toggle Safe Mode
     jQuery.ajax({
       type:       'POST',
@@ -216,15 +242,6 @@
         var $msgExpiry = $('.et-support-user-expiry').first();
         if ('activate' === postData.support_update) {
           $('.et_safe_mode_toggle .et_pb_yes_no_button').removeClass('et_pb_off_state').addClass('et_pb_on_state');
-          $('.wp-admin').addClass('et-safe-mode-active');
-          $('#wpwrap').append(
-            $('<a>')
-              .attr({
-                'class': 'et-safe-mode-indicator',
-                'href':  etSupportCenter.supportCenterURL
-              })
-              .text(etSupportCenter.safeModeCTA)
-          );
         } else if ('deactivate' === postData.support_update) {
           $('.et_safe_mode_toggle .et_pb_yes_no_button').removeClass('et_pb_on_state').addClass('et_pb_off_state');
           $('.et-safe-mode-indicator').fadeOut('slow');
@@ -240,8 +257,9 @@
       }
     }).fail(function(data) {
       console.log(data.responseText);
+      $save_message.fadeOut('slow');
     });
-  };
+  }
 
   // Safe Mode: Interrupt Actions when Safe Mode is Active
   function preventActionWhenSafeModeActive() {
@@ -388,7 +406,7 @@
     /**
      * Support Center :: Documentation & Help
      */
-    if ($('body').is('.divi_page_et_support_center, .extra_page_et_support_center')) {
+    if ($('body').find('[data-et-page="wp-admin-support-center"]').length > 0) {
       // Load the IFrame Player API code asynchronously.
       var tag            = document.createElement('script');
       tag.src            = 'https://www.youtube.com/iframe_api';

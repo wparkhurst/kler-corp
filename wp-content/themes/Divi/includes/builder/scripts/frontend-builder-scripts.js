@@ -281,7 +281,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 					// Removing DOM that was added by slider
 					$et_slider.find('.et-pb-slider-arrows, .et-pb-controllers').remove();
-					$et_slider.siblings('.et_pb_carousel').remove();
+					$et_slider.siblings('.et_pb_carousel, .et-pb-controllers').remove();
 
 					// Remove references
 					$et_slider.removeData( 'et_pb_simple_slider' );
@@ -2543,6 +2543,12 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 								infowindow_active = infowindow;
 
 								infowindow.open( $this_map_container.data('map'), marker );
+
+								// Trigger mouse hover event for responsive content swap.
+								$this_marker.closest('.et_pb_module').trigger('mouseleave');
+								setTimeout(function (){
+									$this_marker.closest('.et_pb_module').trigger('mouseenter');
+								}, 1);
 							});
 						}
 					});
@@ -5224,6 +5230,10 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					$.proxy( et_calc_fullscreen_section, $( this ) )();
 				});
 
+				if (is_frontend_builder) {
+					return;
+				}
+
 				clearTimeout(et_calc_fullscreen_section.timeout);
 
 				et_calc_fullscreen_section.timeout = setTimeout(function () {
@@ -6224,4 +6234,748 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 		}
 	}
 	et_fix_html_margin();
+
+	// Muti View Data Handler (Responsive + Hover)
+	var et_multi_view = {
+		contexts: ['content', 'attrs', 'styles', 'classes', 'visibility'],
+		windowWidth: $(window).width(),
+		init: function () {
+			$('#main-header, #main-footer').off('mouseenter', et_multi_view.resetHoverStateHandler);
+			$('#main-header, #main-footer').on('mouseenter', et_multi_view.resetHoverStateHandler);
+
+			$('[data-et-multi-view]').each(function () {
+				var data = et_multi_view.getData($(this));
+
+				et_multi_view.normalStateHandler(data);
+
+				if (data.$hoverSelector && data.$hoverSelector.length) {
+					data.$hoverSelector.off('touchstart touchend', et_multi_view.touchStateHandler);
+					data.$hoverSelector.on('touchstart touchend', et_multi_view.touchStateHandler);
+
+					data.$hoverSelector.off('mouseenter mouseleave', et_multi_view.hoverStateHandler);
+					data.$hoverSelector.on('mouseenter mouseleave', et_multi_view.hoverStateHandler);
+				}
+			});
+		},
+		normalStateHandler: function (data) {
+			if (!data || et_multi_view.isEmptyObject(data.normalState)) {
+				return;
+			}
+
+			et_multi_view.callbackHandlerDefault(data.normalState, data.$target, data.$source, data.slug);
+		},
+		touchStateHandler: function (event) {
+			var $hoverSelector = $(this);
+
+			if ('touchend' === event.type) {
+				setTimeout(function () {
+					$hoverSelector.on('mouseenter mouseleave', et_multi_view.hoverStateHandler);
+				}, 1)
+			} else if (event.type === 'touchstart') {
+				$hoverSelector.off('mouseenter mouseleave', et_multi_view.hoverStateHandler);
+			}
+		},
+		hoverStateHandler: function (event) {
+			var $hoverSelector = $(this);
+			var datas = [];
+
+			if ($hoverSelector.data('etMultiView')) {
+				datas.push(et_multi_view.getData($hoverSelector));
+			}
+
+			$hoverSelector.find('[data-et-multi-view]').each(function () {
+				datas.push(et_multi_view.getData($(this)));
+			});
+
+			if (event.type === 'mouseenter' && !$hoverSelector.hasClass('et_multi_view__hovered')) {
+				et_multi_view.resetHoverStateHandler($hoverSelector);
+				$hoverSelector.addClass('et_multi_view__hovered');
+
+				for (var index = 0; index < datas.length; index++) {
+					var data = datas[index];
+
+					if (data && !et_multi_view.isEmptyObject(data.normalState) && !et_multi_view.isEmptyObject(data.hoverState)) {
+						et_multi_view.callbackHandlerDefault(data.hoverState, data.$target, data.$source, data.slug);
+					}
+				}
+			} else if (event.type === 'mouseleave' && $hoverSelector.hasClass('et_multi_view__hovered')) {
+				for (var index = 0; index < datas.length; index++) {
+					var data = datas[index];
+
+					if (data && !et_multi_view.isEmptyObject(data.normalState) && !et_multi_view.isEmptyObject(data.hoverState)) {
+						et_multi_view.callbackHandlerDefault(data.normalState, data.$target, data.$source, data.slug);
+					}
+				}
+
+				$hoverSelector.removeClass('et_multi_view__hovered');
+			}
+		},
+		resetHoverStateHandler: function ($exclude) {
+			$('[data-et-multi-view]').each(function () {
+				var data = et_multi_view.getData($(this));
+
+				if (data &&
+					data.$hoverSelector &&
+					data.$hoverSelector.length &&
+					data.$hoverSelector.hasClass('et_multi_view__hovered') &&
+					!data.$hoverSelector.is($exclude)
+				) {
+					data.$hoverSelector.trigger('mouseleave');
+				}
+			});
+		},
+		getData: function ($source) {
+			if (!$source || !$source.length) {
+				return false;
+			}
+
+			var screenMode = et_multi_view.getScreenMode();
+			var data = $source.data('etMultiView');
+
+			if (!data) {
+				return false;
+			}
+
+			if (typeof data === 'string') {
+				data = et_multi_view.tryParseJSON(data);
+			}
+
+			if (!data || !data.schema || !data.slug) {
+				return false;
+			}
+
+			var $target = data.target ? $(data.target) : $source;
+
+			if (!$target || !$target.length) {
+				return false;
+			}
+
+			var normalState = {};
+			var hoverState = {};
+
+			for (var i = 0; i < et_multi_view.contexts.length; i++) {
+				var context = et_multi_view.contexts[i];
+
+				// Set context data.
+				if (data.schema && data.schema.hasOwnProperty(context)) {
+					// Set normal state context data.
+					if (data.schema[context].hasOwnProperty(screenMode)) {
+						normalState[context] = data.schema[context][screenMode];
+					} else {
+						if (screenMode === 'tablet' && data.schema[context].hasOwnProperty('desktop')) {
+							normalState[context] = data.schema[context].desktop;
+						} else if (screenMode === 'phone' && data.schema[context].hasOwnProperty('tablet')) {
+							normalState[context] = data.schema[context].tablet;
+						} else if (screenMode === 'phone' && data.schema[context].hasOwnProperty('desktop')) {
+							normalState[context] = data.schema[context].desktop;
+						}
+					}
+
+					// Set hover state context data.
+					if (data.schema[context].hasOwnProperty('hover')) {
+						hoverState[context] = data.schema[context].hover;
+					}
+				}
+			}
+
+			var $hoverSelector = data.hover_selector ? $(data.hover_selector) : false;
+
+			if (!$hoverSelector || !$hoverSelector.length) {
+				$hoverSelector = $source.hasClass('.et_pb_module') ? $source : $source.closest('.et_pb_module');
+			}
+
+			return {
+				normalState: normalState,
+				hoverState: hoverState,
+				$target: $target,
+				$source: $source,
+				$hoverSelector: $hoverSelector,
+				slug: data.slug,
+				screenMode: screenMode
+			};
+		},
+		callbackHandlerDefault: function (data, $target, $source, slug) {
+			var callbackHandlerCustom = et_multi_view.getCallbackHandlerCustom(slug, data, $target);
+
+			if (callbackHandlerCustom && typeof callbackHandlerCustom === 'function') {
+				return callbackHandlerCustom(data, $target, $source, slug);
+			}
+
+			var updated = {};
+
+			if (data.hasOwnProperty('content')) {
+				updated.content = et_multi_view.updateContent(data.content, $target, $source);
+			}
+
+			if (data.hasOwnProperty('attrs')) {
+				updated.attrs = et_multi_view.updateAttrs(data.attrs, $target, $source);
+			}
+
+			if (data.hasOwnProperty('styles')) {
+				updated.styles = et_multi_view.updateStyles(data.styles, $target, $source);
+			}
+
+			if (data.hasOwnProperty('classes')) {
+				updated.classes = et_multi_view.updateClasses(data.classes, $target, $source);
+			}
+
+			if (data.hasOwnProperty('visibility')) {
+				updated.visibility = et_multi_view.updateVisibility(data.visibility, $target, $source);
+			}
+
+			return et_multi_view.isEmptyObject(updated) ? false : updated;
+		},
+		callbackHandlerCounter: function (data, $target, $source, slug) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+
+			if (updated && updated.attrs && updated.attrs.hasOwnProperty('data-width')) {
+				window.et_bar_counters_init($target);
+			}
+		},
+		callbackHandlerNumberCounter: function (data, $target, $source, slug) {
+			if ($target.hasClass('title')) {
+				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			}
+
+			var attrs = data.attrs || false;
+
+			if (!attrs) {
+				return;
+			}
+
+			if (attrs.hasOwnProperty('data-percent-sign')) {
+				et_multi_view.updateContent(attrs['data-percent-sign'], $target.find('.percent-sign'), $source);
+			}
+
+			if (attrs.hasOwnProperty('data-number-value')) {
+				var $the_counter = $target.closest('.et_pb_number_counter');
+				var numberValue = attrs['data-number-value'] || 50;
+				var numberSeparator = attrs['data-number-separator'] || '';
+
+				var updated = et_multi_view.updateAttrs({
+					'data-number-value': numberValue,
+					'data-number-separator': numberSeparator,
+				}, $the_counter, $source);
+
+				if (updated && $the_counter.data('easyPieChart')) {
+					$the_counter.data('easyPieChart').update(numberValue);
+				}
+			}
+		},
+		callbackHandlerCircleCounter: function (data, $target, $source, slug) {
+			if (!$target.hasClass('et_pb_circle_counter_inner')) {
+				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			}
+
+			var attrs = data.attrs || false;
+
+			if (!attrs) {
+				return;
+			}
+
+			if (attrs.hasOwnProperty('data-percent-sign')) {
+				et_multi_view.updateContent(attrs['data-percent-sign'], $target.find('.percent-sign'), $source);
+			}
+
+			if (attrs.hasOwnProperty('data-number-value')) {
+				var $the_counter = $target.closest('.et_pb_circle_counter_inner');
+				var numberValue = attrs['data-number-value'];
+
+				var attrsUpdated = et_multi_view.updateAttrs({
+					'data-number-value': numberValue,
+				}, $the_counter, $source);
+
+				if (attrsUpdated && $the_counter.data('easyPieChart')) {
+					window.et_pb_circle_counter_init($the_counter);
+					$the_counter.data('easyPieChart').update(numberValue);
+				}
+			}
+		},
+		callbackHandlerSlider: function (data, $target, $source, slug) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+
+			if ($target.hasClass('et_pb_module') && updated && updated.classes) {
+				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_arrows') !== -1) {
+					$target.find('.et-pb-slider-arrows').addClass('et_multi_view_hidden');
+				}
+
+				if (updated.classes.remove && updated.classes.remove.indexOf('et_pb_slider_no_arrows') !== -1) {
+					$target.find('.et-pb-slider-arrows').removeClass('et_multi_view_hidden');
+				}
+
+				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_pagination') !== -1) {
+					$target.find('.et-pb-controllers').addClass('et_multi_view_hidden');
+				}
+
+				if (updated.classes.remove && updated.classes.remove.indexOf('et_pb_slider_no_pagination') !== -1) {
+					$target.find('.et-pb-controllers').removeClass('et_multi_view_hidden');
+				}
+			}
+		},
+		callbackHandlerPostSlider: function (data, $target, $source, slug) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+
+			if ($target.hasClass('et_pb_module') && updated && updated.classes) {
+				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_arrows') !== -1) {
+					$target.find('.et-pb-slider-arrows').addClass('et_multi_view_hidden');
+				}
+
+				if (updated.classes.remove && updated.classes.remove.indexOf('et_pb_slider_no_arrows') !== -1) {
+					$target.find('.et-pb-slider-arrows').removeClass('et_multi_view_hidden');
+				}
+
+				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_pagination') !== -1) {
+					$target.find('.et-pb-controllers').addClass('et_multi_view_hidden');
+				}
+
+				if (updated.classes.remove && updated.classes.remove.indexOf('et_pb_slider_no_pagination') !== -1) {
+					$target.find('.et-pb-controllers').removeClass('et_multi_view_hidden');
+				}
+			}
+		},
+		callbackHandlerVideoSlider: function (data, $target, $source, slug) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+
+			if ($target.hasClass('et_pb_slider') && updated && updated.classes) {
+				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_arrows') !== -1) {
+					$target.find('.et-pb-slider-arrows').addClass('et_multi_view_hidden');
+				}
+
+				if (updated.classes.remove && updated.classes.remove.indexOf('et_pb_slider_no_arrows') !== -1) {
+					$target.find('.et-pb-slider-arrows').removeClass('et_multi_view_hidden');
+				}
+
+				var isInitSlider = function () {
+					if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_dots') !== -1) {
+						return 'et_pb_slider_dots';
+					}
+
+					if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_carousel') !== -1) {
+						return 'et_pb_slider_carousel';
+					}
+
+					return false;
+				};
+
+				var sliderControl = isInitSlider();
+
+				if (sliderControl) {
+					var sliderApi = $target.data('et_pb_simple_slider');
+
+					if (typeof sliderApi === 'object') {
+						sliderApi.et_slider_destroy();
+					}
+
+					et_pb_slider_init($target);
+
+					if (sliderControl === 'et_pb_slider_carousel') {
+						$target.siblings('.et_pb_carousel').et_pb_simple_carousel({
+							slide_duration: 1000
+						});
+					}
+				}
+			}
+		},
+		callbackHandlerSliderItem: function (data, $target, $source, slug) {
+			if (!$target.hasClass('et_pb_slide_video') && !$target.is('img')) {
+				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			}
+
+			if ($target.hasClass('et_pb_slide_video')) {
+				var $contentNew = data && data.content ? $(data.content) : false;
+				var $contentOld = $target.html().indexOf('fluid-width-video-wrapper') !== -1
+					? $($target.find('.fluid-width-video-wrapper').html())
+					: $($target.html());
+
+				if (!$contentNew || !$contentOld) {
+					return;
+				}
+				var updated = false;
+
+				if ($contentNew.hasClass('wp-video') && $contentOld.hasClass('wp-video')) {
+					var isVideoNeedUpdate = function () {
+						if ($contentNew.find('source').length !== $contentOld.find('source').length) {
+							return true;
+						}
+
+						var isDifferentAttr = false;
+
+						$contentNew.find('source').each(function (index) {
+							var $contentOldSource = $contentOld.find('source').eq(index);
+
+							if ($(this).attr('src') !== $contentOldSource.attr('src')) {
+								isDifferentAttr = true;
+							}
+						});
+
+						return isDifferentAttr;
+					};
+
+					if (isVideoNeedUpdate()) {
+						updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+					}
+				} else if ($contentNew.is('iframe') && $contentOld.is('iframe') && $contentNew.attr('src') !== $contentOld.attr('src')) {
+					updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				} else if (($contentNew.hasClass('wp-video') && $contentOld.is('iframe')) || ($contentNew.is('iframe') && $contentOld.hasClass('wp-video'))) {
+					updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				}
+
+				if (updated && updated.content) {
+					if ($contentNew.is('iframe')) {
+						$target.closest('.et_pb_module').fitVids();
+					} else {
+						var videoWidth = $contentNew.find('video').attr('width');
+						var videoHeight = $contentNew.find('video').attr('height');
+						var videContainerWidth = $target.width();
+						var videContainerHeight = (videContainerWidth / videoWidth) * videoHeight;
+
+						$target.find('video').mediaelementplayer({
+							videoWidth: parseInt(videContainerWidth),
+							videoHeight: parseInt(videContainerHeight),
+							autosizeProgress: false,
+							success: function (mediaElement, domObject) {
+								var $domObject = $(domObject);
+								var videoMarginTop = (videContainerHeight - $domObject.height()) + $(mediaElement).height();
+
+								$domObject.css('margin-top', videoMarginTop + 'px');
+							},
+						});
+					}
+				}
+			} else if ($target.is('img')) {
+				var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+
+				if (updated && updated.attrs && updated.attrs.src) {
+					var $slider = $target.closest('.et_pb_module');
+
+					$target.css('visibility', 'hidden');
+
+					et_fix_slider_height($slider);
+
+					setTimeout(function () {
+						et_fix_slider_height($slider);
+						$target.css('visibility', 'visible');
+					}, 100);
+				}
+			}
+		},
+		callbackHandlerVideo: function (data, $target, $source, slug) {
+			if ($target.hasClass('et_pb_video_overlay')) {
+				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			}
+
+			var updated = false;
+
+			var $contentNew = data && data.content ? $(data.content) : false;
+			var $contentOld = $target.html().indexOf('fluid-width-video-wrapper') !== -1
+				? $($target.find('.fluid-width-video-wrapper').html())
+				: $($target.html());
+
+			if (!$contentNew || !$contentOld) {
+				return;
+			}
+
+			if ($contentNew.is('video') && $contentOld.is('video')) {
+				var isVideoNeedUpdate = function () {
+					if ($contentNew.find('source').length !== $contentOld.find('source').length) {
+						return true;
+					}
+
+					var isDifferentAttr = false;
+
+					$contentNew.find('source').each(function (index) {
+						var $contentOldSource = $contentOld.find('source').eq(index);
+
+						if ($(this).attr('src') !== $contentOldSource.attr('src')) {
+							isDifferentAttr = true;
+						}
+					});
+
+					return isDifferentAttr;
+				};
+
+				if (isVideoNeedUpdate()) {
+					updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				}
+			} else if ($contentNew.is('iframe') && $contentOld.is('iframe') && $contentNew.attr('src') !== $contentOld.attr('src')) {
+				updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			} else if (($contentNew.is('video') && $contentOld.is('iframe')) || ($contentNew.is('iframe') && $contentOld.is('video'))) {
+				updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			}
+
+			if (updated && updated.content) {
+				if ($contentNew.is('iframe') && $.fn.fitVids) {
+					$target.fitVids();
+				}
+			}
+
+			return updated;
+		},
+		callbackHandlerBlog: function (data, $target, $source, slug) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+
+			if (updated && updated.classes && updated.classes.add && updated.classes.add.indexOf('et_pb_blog_show_content') !== -1) {
+				et_reinit_waypoint_modules();
+			}
+		},
+		callbackHandlerTestimonial: function (data, $target, $source, slug) {
+			if (!$source.hasClass('et_pb_testimonial_description_inner')) {
+				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			}
+
+			$.each($target.find('.et_pb_testimonial_author').prevAll(), function () {
+				$(this).remove();
+			});
+
+			$target.find('.et_pb_testimonial_author').before($(data.content));
+
+			if (!$source.hasClass('et_multi_view_swapped')) {
+				$source.addClass('et_multi_view_swapped');
+			}
+		},
+		getCallbackHandlerCustom: function (slug) {
+			switch (slug) {
+				case 'et_pb_counter':
+					return et_multi_view.callbackHandlerCounter;
+
+				case 'et_pb_number_counter':
+					return et_multi_view.callbackHandlerNumberCounter;
+
+				case 'et_pb_circle_counter':
+					return et_multi_view.callbackHandlerCircleCounter;
+
+				case 'et_pb_slider':
+				case 'et_pb_fullwidth_slider':
+					return et_multi_view.callbackHandlerSlider;
+
+				case 'et_pb_post_slider':
+				case 'et_pb_fullwidth_post_slider':
+					return et_multi_view.callbackHandlerPostSlider;
+
+				case 'et_pb_video_slider':
+					return et_multi_view.callbackHandlerVideoSlider;
+
+				case 'et_pb_slide':
+					return et_multi_view.callbackHandlerSliderItem;
+
+				case 'et_pb_video':
+					return et_multi_view.callbackHandlerVideo;
+
+				case 'et_pb_blog':
+					return et_multi_view.callbackHandlerBlog;
+
+				case 'et_pb_testimonial':
+					return et_multi_view.callbackHandlerTestimonial;
+
+				default:
+					return false;
+			}
+		},
+		updateContent: function (content, $target, $source) {
+			if (typeof content === 'undefined') {
+				return false;
+			}
+
+			var updated = false;
+
+			if ($target.html() !== content) {
+				$target.empty().html(content);
+				updated = true;
+			}
+
+			if (updated && !$source.hasClass('et_multi_view_swapped')) {
+				$source.addClass('et_multi_view_swapped');
+			}
+
+			return updated;
+		},
+		updateAttrs: function (attrs, $target, $source) {
+			if (!attrs) {
+				return false;
+			}
+
+			var updated = {};
+
+			$.each(attrs, function (key, value) {
+				switch (key) {
+					case 'class':
+						// Do nothing, use classes data contexts and updateClasses method instead.
+						break;
+
+					case 'style':
+						// Do nothing, use styles data contexts and updateStyles method instead.
+						break;
+
+					default:
+						if ($target.attr(key) !== value) {
+							$target.attr(key, value);
+
+							if (key.indexOf('data-') === 0) {
+								$target.data(key.replace('data-', ''), value);
+							}
+
+							updated[key] = value;
+						}
+						break;
+				}
+			});
+
+			if (et_multi_view.isEmptyObject(updated)) {
+				return false;
+			}
+
+			if (!$source.hasClass('et_multi_view_swapped')) {
+				$source.addClass('et_multi_view_swapped');
+			}
+
+			return updated;
+		},
+		updateStyles: function (styles, $target, $source) {
+			if (!styles) {
+				return false;
+			}
+
+			var updated = {};
+
+			$.each(styles, function (key, value) {
+				if ($target.css(key) !== value) {
+					$target.css(key, value);
+					updated[key] = value;
+				}
+			});
+
+			if (et_multi_view.isEmptyObject(updated)) {
+				return false;
+			}
+
+			if (!$source.hasClass('et_multi_view_swapped')) {
+				$source.addClass('et_multi_view_swapped');
+			}
+
+			return updated;
+		},
+		updateClasses: function (classes, $target, $source) {
+			if (!classes) {
+				return false;
+			}
+
+			var updated = {};
+
+			// Add CSS class
+			if (classes.add) {
+				for (var i = 0; i < classes.add.length; i++) {
+					if (!$target.hasClass(classes.add[i])) {
+						$target.addClass(classes.add[i]);
+
+						if (!updated.hasOwnProperty('add')) {
+							updated.add = [];
+						}
+						updated.add.push(classes.add[i]);
+					}
+				}
+			}
+
+			// Remove CSS class
+			if (classes.remove) {
+				for (var i = 0; i < classes.remove.length; i++) {
+					if ($target.hasClass(classes.remove[i])) {
+						$target.removeClass(classes.remove[i]);
+
+						if (!updated.hasOwnProperty('remove')) {
+							updated.remove = [];
+						}
+						updated.remove.push(classes.remove[i]);
+					}
+				}
+			}
+
+			if (et_multi_view.isEmptyObject(updated)) {
+				return false;
+			}
+
+			if (!$source.hasClass('et_multi_view_swapped')) {
+				$source.addClass('et_multi_view_swapped');
+			}
+
+			return updated;
+		},
+		updateVisibility: function (isVisible, $target, $source) {
+			var updated = {};
+
+			if (isVisible && $target.hasClass('et_multi_view_hidden')) {
+				$target.removeClass('et_multi_view_hidden');
+				updated.isVisible = true;
+			}
+
+			if (!isVisible && !$target.hasClass('et_multi_view_hidden')) {
+				$target.addClass('et_multi_view_hidden');
+				updated.isHidden = true;
+			}
+
+			if (et_multi_view.isEmptyObject(updated)) {
+				return false;
+			}
+
+			if (!$source.hasClass('et_multi_view_swapped')) {
+				$source.addClass('et_multi_view_swapped');
+			}
+
+			return updated;
+		},
+		isEmptyObject: function (obj) {
+			if (!obj) {
+				return true;
+			}
+
+			var isEmpty = true;
+
+			for (var key in obj) {
+				if (obj.hasOwnProperty(key)) {
+					isEmpty = false;
+				}
+			}
+
+			return isEmpty;
+		},
+		tryParseJSON: function (string) {
+			try {
+				return JSON.parse(string);
+			} catch (e) {
+				return false;
+			}
+		},
+		getScreenMode: function () {
+			var screenMode;
+
+			if (et_multi_view.windowWidth > 980) {
+				screenMode = 'desktop';
+			} else if (et_multi_view.windowWidth > 767) {
+				screenMode = 'tablet';
+			} else {
+				screenMode = 'phone';
+			}
+
+			return screenMode;
+		},
+	};
+
+	if (!isBuilder) {
+		$(document).ready(et_multi_view.init);
+
+		var et_multi_view_timer = null;
+		$(window).on('resize', function () {
+			// Make sure only to run this when the actual window size width is changed
+			var resizedWindowWidth = $(window).width();
+
+			if (resizedWindowWidth === et_multi_view.windowWidth) {
+				return;
+			}
+
+			et_multi_view.windowWidth = resizedWindowWidth;
+
+			clearTimeout(et_multi_view_timer);
+
+			et_multi_view_timer = setTimeout(et_multi_view.init, 300);
+		});
+	}
 })(jQuery);
