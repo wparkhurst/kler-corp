@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="https://kler.io/sitemap.xsl"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- Sitemap is generated on 2019-09-17 18:28:16 GMT -->
+<!-- Sitemap is generated on 2019-09-24 15:46:01 GMT -->
 	<url>
 		<loc>https://kler.io/</loc>
 		<lastmod>2019-08-29T10:21-07:00</lastmod>
@@ -47,7 +47,7 @@
 	</url>
 	<url>
 		<loc>https://kler.io/request-submitted/</loc>
-		<lastmod>2019-08-06T11:25-07:00</lastmod>
+		<lastmod>2019-09-20T12:35-07:00</lastmod>
 	</url>
 	<url>
 		<loc>https://kler.io/privacy-policy/</loc>
@@ -98,8 +98,8 @@
 		<lastmod>2019-09-16T11:49-07:00</lastmod>
 	</url>
 	<url>
-		<loc>https://kler.io/reseller/</loc>
-		<lastmod>2019-09-17T16:35-07:00</lastmod>
+		<loc>https://kler.io/referrals/</loc>
+		<lastmod>2019-09-24T15:19-07:00</lastmod>
 	</url>
 </urlset>
-<!-- Sitemap is generated for this view -->
+<!-- Sitemap is served from cache -->
