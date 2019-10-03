@@ -437,6 +437,20 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				'data-fixed-height-onload': main_header_fixed_height
 			});
 
+			var $wooCommerceNotice = $('.et_fixed_nav.et_transparent_nav.et-db.et_full_width_page #left-area > .woocommerce-notices-wrapper');
+
+			if ($wooCommerceNotice.length > 0 && 'yes' !== $wooCommerceNotice.attr('data-position-set')) {
+				var wooNoticeMargin = main_header_fixed_height;
+				
+				if (0 === wooNoticeMargin && $main_header.attr('data-height-onload')) {
+					wooNoticeMargin = $main_header.attr('data-height-onload');
+				}
+
+				$wooCommerceNotice.css('marginTop', parseFloat(wooNoticeMargin));
+				$wooCommerceNotice.animate({ 'opacity': '1' });
+				$wooCommerceNotice.attr('data-position-set', 'yes');
+			}
+
 			// Specific adjustment required for transparent nav + not vertical nav
 			if (window.et_is_transparent_nav && !window.et_is_vertical_nav) {
 

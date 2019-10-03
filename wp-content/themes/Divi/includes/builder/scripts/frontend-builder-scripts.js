@@ -1,6 +1,6 @@
 // Check whether current page is inside (visual) builder or not
 var isBuilder = 'object' === typeof window.ET_Builder;
-
+ 
 /*! ET frontend-builder-scripts.js */
 (function($){
 	var $et_window = $(window);
@@ -37,6 +37,31 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 		}
 
 		return $found;
+	};
+
+	/*
+	 * Star-based rating UI.
+	 * @see: WooCommerce's woocommerce/assets/js/frontend/single-product.js file
+	 */
+	window.et_pb_init_woo_star_rating = function($rating_selector) {
+		var $rating_parent  = $rating_selector.closest('div');
+		var $existing_stars = $rating_parent.find('p.stars');
+
+		if ($existing_stars.length > 0) {
+			$existing_stars.remove();
+		}
+
+		$rating_selector.hide().before(
+			'<p class="stars">\
+				<span>\
+					<a class="star-1" href="#">1</a>\
+					<a class="star-2" href="#">2</a>\
+					<a class="star-3" href="#">3</a>\
+					<a class="star-4" href="#">4</a>\
+					<a class="star-5" href="#">5</a>\
+				</span>\
+			</p>'
+		);
 	};
 
 	window.et_pb_init_modules = function() {
@@ -2422,48 +2447,48 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				et_pb_countdown_timer_init( $et_pb_countdown_timer );
 			}
 
-			if ( $et_pb_tabs.length || is_frontend_builder ) {
-				window.et_pb_tabs_init = function( $et_pb_tabs ) {
-					var $et_pb_tabs_li = $et_pb_tabs.find( '.et_pb_tabs_controls li' );
+			if ($et_pb_tabs.length || is_frontend_builder) {
+				window.et_pb_tabs_init = function ($et_pb_tabs) {
+					var $et_pb_tabs_li = $et_pb_tabs.find('.et_pb_tabs_controls li');
 
-					$et_pb_tabs.et_pb_simple_slider( {
-						use_controls   : false,
-						use_arrows     : false,
-						slide          : '.et_pb_all_tabs > div',
-						tabs_animation : true
-					} ).on('et_hashchange', function( event ){
+					$et_pb_tabs.et_pb_simple_slider({
+						use_controls: false,
+						use_arrows: false,
+						slide: '.et_pb_all_tabs > div',
+						tabs_animation: true
+					}).on('et_hashchange', function (event) {
 						var params = event.params;
-						var $the_tabs = $( '#' + event.target.id );
+						var $the_tabs = $('#' + event.target.id);
 						var active_tab = params[0];
-						if ( !$the_tabs.find( '.et_pb_tabs_controls li' ).eq( active_tab ).hasClass('et_pb_tab_active') ) {
-							$the_tabs.find( '.et_pb_tabs_controls li' ).eq( active_tab ).click();
+						if (!$the_tabs.find('.et_pb_tabs_controls li').eq(active_tab).hasClass('et_pb_tab_active')) {
+							$the_tabs.find('.et_pb_tabs_controls li').eq(active_tab).click();
 						}
 					});
 
-					$et_pb_tabs_li.click( function() {
-						var $this_el        = $(this),
-							$tabs_container = $this_el.closest( '.et_pb_tabs' ).data('et_pb_simple_slider');
+					$et_pb_tabs_li.click(function () {
+						var $this_el = $(this),
+							$tabs_container = $this_el.closest('.et_pb_tabs').data('et_pb_simple_slider');
 
-						if ( $tabs_container.et_animation_running ) return false;
+						if ($tabs_container.et_animation_running) return false;
 
-						$this_el.addClass( 'et_pb_tab_active' ).siblings().removeClass( 'et_pb_tab_active' );
+						$this_el.addClass('et_pb_tab_active').siblings().removeClass('et_pb_tab_active');
 
-						$tabs_container.data('et_pb_simple_slider').et_slider_move_to( $this_el.index() );
+						$tabs_container.data('et_pb_simple_slider').et_slider_move_to($this_el.index());
 
-						if ( $this_el.closest( '.et_pb_tabs' ).attr('id') ) {
+						if ($this_el.closest('.et_pb_tabs').attr('id')) {
 							var tab_state = [];
-							tab_state.push( $this_el.closest( '.et_pb_tabs' ).attr('id') );
-							tab_state.push( $this_el.index() );
-							tab_state = tab_state.join( et_hash_module_param_seperator );
-							et_set_hash( tab_state );
+							tab_state.push($this_el.closest('.et_pb_tabs').attr('id'));
+							tab_state.push($this_el.index());
+							tab_state = tab_state.join(et_hash_module_param_seperator);
+							et_set_hash(tab_state);
 						}
 
 						return false;
-					} );
+					});
 
 					window.et_pb_set_tabs_height();
 				};
-				window.et_pb_tabs_init( $et_pb_tabs );
+				window.et_pb_tabs_init($et_pb_tabs);
 			}
 
 			if ( $et_pb_map.length || is_frontend_builder ) {
@@ -2496,9 +2521,13 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						this_map_grayscale = '-' + this_map_grayscale.toString();
 					}
 
+					// Being saved to pass lat and lang of center location.
+					var data_center_lat = parseFloat($this_map.attr('data-center-lat')) || 0;
+					var data_center_lng = parseFloat($this_map.attr('data-center-lng')) || 0;
+
 					$this_map_container.data('map', new google.maps.Map( $this_map[0], {
 						zoom: parseInt( $this_map.attr('data-zoom') ),
-						center: new google.maps.LatLng( parseFloat( $this_map.attr('data-center-lat') ) , parseFloat( $this_map.attr('data-center-lng') )),
+						center: new google.maps.LatLng(data_center_lat, data_center_lng),
 						mapTypeId: google.maps.MapTypeId.ROADMAP,
 						scrollwheel: $this_map.attr('data-mouse-wheel') == 'on' ? true : false,
 						draggable: is_draggable,
@@ -2565,28 +2594,26 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 			}
 
-			if ( $et_pb_shop.length ) {
-				$et_pb_shop.each( function() {
-					var $this_el    = $(this),
-						icon        = $this_el.data('icon') || '',
-						icon_tablet = $this_el.data('icon-tablet') || '',
-						icon_phone  = $this_el.data('icon-phone') || '',
-						$overlay    = $this_el.find( '.et_overlay' );
+			$('.et_pb_shop, .et_pb_wc_upsells, .et_pb_wc_related_products').each(function() {
+				var $this_el    = $(this);
+				var icon        = $this_el.data('icon') || '';
+				var icon_tablet = $this_el.data('icon-tablet') || '';
+				var icon_phone  = $this_el.data('icon-phone') || '';
+				var $overlay    = $this_el.find('.et_overlay');
 
-					// Set data icon and inline icon class.
-					if ( icon !== '' ) {
-						$overlay.attr( 'data-icon', icon ).addClass( 'et_pb_inline_icon' );
-					}
+				// Set data icon and inline icon class.
+				if (icon !== '') {
+					$overlay.attr('data-icon', icon).addClass('et_pb_inline_icon');
+				}
 
-					if ( icon_tablet !== '' ) {
-						$overlay.attr( 'data-icon-tablet', icon_tablet ).addClass( 'et_pb_inline_icon_tablet' );
-					}
+				if (icon_tablet !== '') {
+					$overlay.attr('data-icon-tablet', icon_tablet).addClass('et_pb_inline_icon_tablet');
+				}
 
-					if ( icon_phone !== '' ) {
-						$overlay.attr( 'data-icon-phone', icon_phone ).addClass( 'et_pb_inline_icon_phone' );
-					}
-				} );
-			}
+				if (icon_phone !== '') {
+					$overlay.attr('data-icon-phone', icon_phone).addClass('et_pb_inline_icon_phone');
+				}
+			});
 
 			$et_pb_background_layout_hoverable.each(function() {
 				var $this_el                = $(this);
@@ -4810,7 +4837,10 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					'.et_pb_contact_captcha',
 
 					// Tabs
-					'.et_pb_tabs_controls a'
+					'.et_pb_tabs_controls a',
+
+					// Woo Image
+					'.flex-control-nav *'
 				];
 
 				for (var i = 0; i < click_exceptions.length; i++) {
@@ -6120,7 +6150,12 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 		// Hover transition are disabled for section dividers to prevent visual glitches while document is loading,
 		// we can enable them again now.
 		$('.et_pb_top_inside_divider.et-no-transition, .et_pb_bottom_inside_divider.et-no-transition').removeClass('et-no-transition');
-		( et_pb_box_shadow_elements||[] ).map(et_pb_box_shadow_apply_overlay);
+
+		// Set a delay just to make sure all modules are ready before we append box shadow container.
+		// Similar approach exists on VB custom CSS output.
+		setTimeout(function() {
+			(et_pb_box_shadow_elements||[]).map(et_pb_box_shadow_apply_overlay);
+		}, 0);
 	});
 
 	$(window).load(function() {
@@ -6161,6 +6196,59 @@ var isBuilder = 'object' === typeof window.ET_Builder;
                     $wc.css({opacity: opacity});
                 }, 0);
 			}
+		}
+
+		/*
+		 * Reinit Star Ratings in Woo Modules.
+		 * Deafuilt Woocommerce scripts do not init Star Ratings correctly
+		 * if there are more than 1 place with stars on page
+		 * Run this on .load event after woocommerce modules are ready and processed.
+		 */
+		if ($('.et_pb_module #rating').length > 0) {
+			$('.et_pb_module #rating').each( function(){
+				window.et_pb_init_woo_star_rating($(this));
+			});
+		}
+
+		/*
+		 * Apply Custom icons to Woo Module Buttons.
+		 * All the buttons generated in WooCommerce template and we cannot add custom attributes
+		 * Therefore we have to use js to add it.
+		 */
+		if ($('.et_pb_woo_custom_button_icon').length > 0) {
+			$('.et_pb_woo_custom_button_icon').each(function() {
+				var $thisModule        = $(this);
+				var buttonClass        = $thisModule.data('button-class');
+				var $buttonEl          = $thisModule.find('.' + buttonClass);
+				var buttonIcon         = $thisModule.attr('data-button-icon');
+				var buttonIconTablet   = $thisModule.attr('data-button-icon-tablet');
+				var buttonIconPhone    = $thisModule.attr('data-button-icon-phone');
+				var buttonClassName    = 'et_pb_promo_button et_pb_button';
+
+				$buttonEl.addClass(buttonClassName);
+
+				if (buttonIcon || buttonIconTablet || buttonIconPhone) {
+					$buttonEl.addClass('et_pb_custom_button_icon');
+					$buttonEl.attr('data-icon', buttonIcon);
+					$buttonEl.attr('data-icon-tablet', buttonIconTablet);
+					$buttonEl.attr('data-icon-phone', buttonIconPhone);
+				}
+			});
+		}
+
+		/**
+		 * Hide empty WooCommerce Meta module
+		 * Meta module component is toggled using classname, thus js visibility check to determine
+		 * whether the module is "empty" (visibility-wise) or not
+		 */
+		if ($('.et_pb_wc_meta').length > 0) {
+			$('.et_pb_wc_meta').each(function() {
+				var $thisModule = $(this);
+
+				if ('' === $thisModule.find('.product_meta span:visible').text()) {
+					$thisModule.addClass('et_pb_wc_meta_empty');
+				}
+			});
 		}
 	});
 
@@ -6733,6 +6821,40 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				$source.addClass('et_multi_view_swapped');
 			}
 		},
+		callbackHandlerWooCommerceBreadcrumb: function(data, $target, $source, slug) {
+			if (data.content) {
+				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+			}
+			if (data.attrs && data.attrs.hasOwnProperty('href')) {
+				var hrefValue = data.attrs['href'];
+				return et_multi_view.updateAttrs({href: hrefValue}, $target, $source);
+			}
+		},
+		callbackHandlerWooCommerceTabs: function(data, $target, $source, slug) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+
+			if (updated && updated.attrs && updated.attrs.hasOwnProperty('data-include_tabs')) {
+				// Show only the enabled Tabs i.e. Hide all tabs and show as required.
+				$target.find('li').hide();
+				$target.find('li').removeClass('et_pb_tab_active');
+
+				var tabClasses = [];
+				var include_tabs = updated.attrs['data-include_tabs'].split('|');
+				include_tabs.forEach(function(elem) {
+					if ('' === elem.trim()) {
+						return;
+					}
+					tabClasses.push(elem + '_tab');
+				});
+
+				tabClasses.forEach(function(elemClass, idx) {
+					if (0 === idx) {
+						$('.' + elemClass).addClass('et_pb_tab_active');
+					}
+					$('.' + elemClass).show();
+				});
+			}
+		},
 		getCallbackHandlerCustom: function (slug) {
 			switch (slug) {
 				case 'et_pb_counter':
@@ -6766,6 +6888,11 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 				case 'et_pb_testimonial':
 					return et_multi_view.callbackHandlerTestimonial;
+
+				case 'et_pb_wc_breadcrumb':
+					return et_multi_view.callbackHandlerWooCommerceBreadcrumb;
+				case 'et_pb_wc_tabs':
+					return et_multi_view.callbackHandlerWooCommerceTabs;
 
 				default:
 					return false;
