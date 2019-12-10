@@ -236,7 +236,7 @@ var CLI=
 		Trunc = {
 		addReadmore:function(textBlock)
 		{	
-			if(textBlock.text().length > 250)
+			if(textBlock.html().length > 250)
 			{
 				jQuery('.cli-privacy-readmore').show();
 			}
@@ -245,16 +245,19 @@ var CLI=
 				jQuery('.cli-privacy-readmore').hide();
 			}
 		},
-		truncateText : function( textBlock ) {            
+		truncateText : function( textBlock ) {   
+			var strippedText = jQuery('<div />').html(textBlock.html()); 
+			strippedText.find('table').remove();        
+			textBlock.html(strippedText.html());
 			while (textBlock.text().length > 250 ) 
 			{
 				textBlock.text(function(index, text) {
-				return text.replace(/\W*\s(\S)*$/, '...');
+					return text.replace(/\W*\s(\S)*$/, '...');
 				});
 			}
 		},     
 		replaceText: function ( textBlock, original ){
-			return textBlock.html(original).height(originalHeight);      
+			return textBlock.html(original);      
 		}  
 		
 		};

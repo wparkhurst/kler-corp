@@ -162,17 +162,19 @@
 .cli-tab-header a.cli-nav-link {position: relative;display: flex;align-items: center;font-size: 14px;color: #000;text-transform: capitalize;}
 .cli-tab-header.cli-tab-active .cli-nav-link:before {transform: rotate(45deg);-webkit-transition: all .2s ease-in-out;-moz-transition: all .2s ease-in-out;transition: all .2s ease-in-out;}
 .cli-tab-header {border-radius: 5px;padding: 12px 15px;cursor: pointer;transition: background-color .2s ease-out .3s,color .2s ease-out 0s;background-color: #f2f2f2;}
-.cli-modal .cli-modal-close {position: absolute;right: 0;top: 0;z-index: 1;-webkit-appearance: none;width: 40px;height: 40px;padding: 0;padding: 10px;border-radius: 50%;background: transparent;border: none;}
+.cli-modal .cli-modal-close {position: absolute;right: 0;top: 0;z-index: 1;-webkit-appearance: none;width: 40px;height: 40px;padding: 0;padding: 10px;border-radius: 50%;background: transparent;border: none;min-width: 40px;}
 .cli-tab-container h4 {font-family: inherit;font-size: 16px;margin-bottom: 15px;margin: 10px 0;}
-.cli-tab-container p {font-size: 14px;line-height: 1.4;margin-bottom: 18px;margin-top: 0;padding: 0;color: #000;}
+#cliSettingsPopup .cli-tab-section-container {padding-top: 12px;}
+.cli-tab-container p, .cli-privacy-content-text {font-size: 14px;line-height: 1.4;margin-top: 0;padding: 0;color: #000;}
+.wt-cli-privacy {display: none;}
 .cli-tab-content {display: none;}
 .cli-tab-section .cli-tab-content {padding: 10px 20px 5px 20px;}
 .cli-tab-section {margin-top: 5px;}
 @media (min-width: 992px) {.cli-modal .cli-modal-dialog {max-width: 645px;}}
-.cli-switch .cli-slider:after {content: attr(data-cli-disable);position: absolute;right: 50px;color: #000;font-size: 12px;text-align: right;}
+.cli-switch .cli-slider:after {content: attr(data-cli-disable);position: absolute;right: 50px;color: #000;font-size: 12px;text-align: right;min-width: 60px;}
 .cli-switch input:checked + .cli-slider:after {content: attr(data-cli-enable);}
 .cli-privacy-overview:not(.cli-collapsed) .cli-privacy-content {max-height: 60px;transition: max-height .15s ease-out;overflow: hidden;}
-a.cli-privacy-readmore {font-size: 12px;padding-top: 12px;display: inline-block;padding-bottom: 12px;cursor: pointer;color: #000;text-decoration: underline;}
+a.cli-privacy-readmore {font-size: 12px;padding-top: 12px;display: inline-block;padding-bottom: 0;cursor: pointer;color: #000;text-decoration: underline;}
 a.cli-privacy-readmore:before {content: attr(data-readmore-text);}
 .cli-collapsed a.cli-privacy-readmore:before {content: attr(data-readless-text);}
 .cli-collapsed .cli-privacy-content {transition: max-height .25s ease-in;}
