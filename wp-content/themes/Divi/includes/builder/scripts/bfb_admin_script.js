@@ -134,7 +134,8 @@
 				// Save content as old content on post meta
 				$et_pb_old_content.val(content);
 
-				if (content.indexOf('[et_pb_section') < 0) {
+				// In some cases we may want to skip adding default Text Module. When Activating BFB on Product Post for example.
+				if (content.indexOf('[et_pb_section') < 0 && 'skip' !== et_bfb_options.skip_default_content_adding) {
 					// Reformat content as text module if it's not a builder shortcode
 					content = '[et_pb_section][et_pb_row][et_pb_column type="' + et_bfb_options.default_initial_column_type + '"][' + et_bfb_options.default_initial_text_module + ']' + content + '[/' + et_bfb_options.default_initial_text_module + '][/et_pb_column][/et_pb_row][/et_pb_section]';
 				}
@@ -142,6 +143,8 @@
 				// Re-set content on editor
 				et_set_wp_editor_content(content);
 			}
+
+			$('body').append('<div class="et-bfb-page-preloading"></div>');
 
 			// Update Post meta directly via ajax request if post has no title or content.
 			// Because in this case clicking `Save` button won't update the post meta.
@@ -154,11 +157,15 @@
 						action : 'et_builder_activate_bfb_auto_draft',
 						et_enable_bfb_nonce : et_bfb_options.et_enable_bfb_nonce,
 						et_post_id : post_id
+					},
+					complete: function() {
+						// Run et_maybe_toggle_bfb after ajax request completed to make sure post is not saved too early.
+						et_maybe_toggle_bfb($save_button);
 					}
 				});
-			}
 
-			$('body').append('<div class="et-bfb-page-preloading"></div>');
+				return;
+			}
 		}
 
 		et_maybe_toggle_bfb($save_button);

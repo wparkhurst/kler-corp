@@ -1,4 +1,6 @@
 (function ($) {
+  var $metabox              = $('#et_settings_meta_box');
+  var $container            = $metabox.find('.et_pb_page_settings_container:first');
   var $toggleBuilderWrapper = $('.et_pb_toggle_builder_wrapper');
   var $pageSettings         = $('.et_pb_page_setting');
   var $layoutSettings       = $('.et_pb_page_layout_settings');
@@ -42,7 +44,24 @@
     }
   }
 
+  function hideSettingsIncompatibleWithTB() {
+	  if ( $container.hasClass('et_pb_page_settings_container--tb-has-header') ) {
+		  $metabox.find('.et_pb_nav_settings').hide();
+	  }
+
+	  if ( $container.hasClass('et_pb_page_settings_container--tb-has-body') ) {
+		  $metabox.find('.et_pb_page_layout_settings, .et_pb_single_title').hide();
+	  }
+  }
+
   if ($toggleBuilderWrapper.hasClass('et_pb_builder_is_used')) {
     hide();
+  }
+
+  hideSettingsIncompatibleWithTB();
+
+  if ($container.height() === 0) {
+    // Dirty fix for metabox ending up empty when all settings get disabled due to various conditions.
+    $metabox.hide();
   }
 }(jQuery));

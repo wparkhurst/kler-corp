@@ -5,7 +5,7 @@ window.wp = window.wp || {};
 /**
  * The builder version and product name will be updated by grunt release task. Do not edit!
  */
-window.et_builder_version = '3.28';
+window.et_builder_version = '4.0.9';
 window.et_builder_product_name = 'Divi';
 
 ( function($) {
@@ -2788,10 +2788,15 @@ window.et_builder_product_name = 'Divi';
 
 				// show only modules that the current element can contain
 				if ( this.attributes['data-open_view'] === 'all_modules' ) {
+					var $viewEl = $( view.render().el );
+
+					// Remove the special Post Content module that is only used in FB.
+					$viewEl.find( 'li.et_pb_post_content, li.et_pb_fullwidth_post_content' ).remove();
+
 					if ( this.model.get( 'module_type' ) === 'section' && typeof( this.model.get( 'et_pb_fullwidth' ) !== 'undefined' ) && this.model.get( 'et_pb_fullwidth' ) === 'on' ) {
-						$( view.render().el ).find( '.et-pb-all-modules li:not(.et_pb_fullwidth_only_module)' ).remove();
+						$viewEl.find( '.et-pb-all-modules li:not(.et_pb_fullwidth_only_module)' ).remove();
 					} else {
-						$( view.render().el ).find( 'li.et_pb_fullwidth_only_module' ).remove();
+						$viewEl.find( 'li.et_pb_fullwidth_only_module' ).remove();
 					}
 				}
 
@@ -3826,7 +3831,7 @@ window.et_builder_product_name = 'Divi';
 
 				this.layoutIsLoading = false;
 
-				this.library_url = 'https://www.elegantthemes.com/layouts';
+				this.library_url = et_pb_options.divi_library_url;
 
 				this.back_button_template = _.template( $('#et-builder-library-back-button-template').html() );
 				this.current_page         = {};
@@ -4820,7 +4825,16 @@ window.et_builder_product_name = 'Divi';
 
 				if ( $time_picker.length ) {
 					// use the specified date format to avoid issues with date translation to different languages
-					$time_picker.datetimepicker({'dateFormat':'yy-mm-dd'});
+					$time_picker.datetimepicker({
+						dateFormat :'yy-mm-dd',
+						beforeShow : function(){
+							// We have css prefix for the jquery ui, add wrapper to make the css work
+							var $datetimepicker = $('#ui-datepicker-div');
+							if ($datetimepicker.closest('.et-fb-option--date-picker').length < 1) {
+								$datetimepicker.wrap('<span class="et-fb-option--date-picker"></span>');
+							}
+					   }
+					});
 				}
 
 				if( $validation_element.length ){

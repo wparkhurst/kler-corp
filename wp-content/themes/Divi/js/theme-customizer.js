@@ -79,8 +79,8 @@
 			}
 
 			if ( header_style === 'split' ) {
-				style_content += "body.et_header_style_split .centered-inline-logo-wrap { width: auto; height: " + ( ( ( menu_height / 100 ) * logo_height ) + 14 ) + "px; }\ ";
-				style_content += "body.et_header_style_split .et-fixed-header .centered-inline-logo-wrap { width: auto; height: " + ( ( ( fixed_menu_height / 100 ) * logo_height ) + 14 ) + "px; }\ ";
+				style_content += "body.et_header_style_split #main-header .centered-inline-logo-wrap { width: auto; height: " + ( ( ( menu_height / 100 ) * logo_height ) + 14 ) + "px; }\ ";
+				style_content += "body.et_header_style_split #main-header.et-fixed-header .centered-inline-logo-wrap { width: auto; height: " + ( ( ( fixed_menu_height / 100 ) * logo_height ) + 14 ) + "px; }\ ";
 				style_content += "body.et_header_style_split .centered-inline-logo-wrap #logo { height: auto; max-height: 100%; }\ ";
 				style_content += "body.et_header_style_split .et-fixed-header .centered-inline-logo-wrap #logo { height: auto; max-height: 100%; }\ ";
 
@@ -401,7 +401,7 @@
 					// Adding specific class to mark the map as first row section element
 					$et_pb_first_row_first_module.addClass( 'et_beneath_transparent_nav' );
 
-				} else if ( $et_pb_first_row_first_module.is( '.et_pb_fullwidth_menu' ) ) {
+				} else if ( $et_pb_first_row_first_module.is( '.et_pb_menu' ) || $et_pb_first_row_first_module.is( '.et_pb_fullwidth_menu' ) ) {
 
 					/* Desktop / Mobile + Pagebuilder + Fullwidth Menu */
 					$et_pb_first_row_first_module.css({ 'marginTop' : header_height });
@@ -638,7 +638,7 @@
 					// Adding specific class to mark the map as first row section element
 					$et_pb_first_row_first_module.removeClass( 'et_beneath_transparent_nav' );
 
-				} else if ( $et_pb_first_row_first_module.is( '.et_pb_fullwidth_menu' ) ) {
+				} else if ( $et_pb_first_row_first_module.is( '.et_pb_menu' ) || $et_pb_first_row_first_module.is( '.et_pb_fullwidth_menu' ) ) {
 
 					/* Desktop / Mobile + Pagebuilder + Fullwidth Menu */
 					$et_pb_first_row_first_module.css({ 'marginTop' : '' });
@@ -1193,6 +1193,25 @@
 
 	et_fix_slide_in_top_bar();
 
+	var $headerPanel       = window.top.wp.customize.panel('et_divi_header_panel');
+	var $headerPanelButton = window.top.jQuery('#accordion-panel-et_divi_header_panel');
+	var $footerPanel       = window.top.wp.customize.panel('et_divi_footer_panel');
+	var $footerPanelButton = window.top.jQuery('#accordion-panel-et_divi_footer_panel');
+
+	if (et_theme_builder_customizer_data.hasHeaderLayout) {
+		$headerPanel.deactivate({ duration: 0 });
+		$headerPanelButton.addClass('et-customizer-hidden');
+	} else {
+		$headerPanelButton.removeClass('et-customizer-hidden');
+	}
+
+	if (et_theme_builder_customizer_data.hasFooterLayout) {
+		$footerPanel.deactivate({ duration: 0 });
+		$footerPanelButton.addClass('et-customizer-hidden');
+	} else {
+		$footerPanelButton.removeClass('et-customizer-hidden');
+	}
+
 	wp.customize( 'blogname', function( value ) {
 		value.bind( function( to ) {
 			$('#logo').attr({ 'alt' : to });
@@ -1453,7 +1472,7 @@
 	wp.customize( 'et_divi[accent_color]', function( value ) {
 		value.bind( function( to ) {
 			var	$accent_style = "<style id='accent_color'>" + css('.et_pb_counter_amount, .et_pb_featured_table .et_pb_pricing_heading, .et_pb_pricing_table_button') + ", .comment-reply-link, " + css('.form-submit .et_pb_button, .et_quote_content, .et_link_content, .et_audio_content, .et_pb_post_slider.et_pb_bg_layout_dark') + ", #page-container .et_slide_in_menu_container, " + css('.et_pb_contact p input[type=\'radio\']:checked + label i:before') + ", #top-header, .et-fixed-header#top-header, .et-fixed-header#top-header #et-secondary-nav li ul { background-color: " + to + "; }\
-								#et_search_icon:hover, .mobile_menu_bar:before" + css('.mobile_menu_bar:before') + ", .footer-widget h4, #main-footer .footer-widget h4, .et-social-icon a:hover, " + css('.et_pb_sum, .et_pb_pricing li a, .et_overlay:before, .et_pb_member_social_links a:hover, .et_pb_widget li a:hover, .et_pb_bg_layout_light .et_pb_promo_button, .et_pb_bg_layout_light .et_pb_more_button, .et_pb_filterable_portfolio .et_pb_portfolio_filters li a.active, .et_pb_filterable_portfolio .et_pb_portofolio_pagination ul li a.active, .et_pb_gallery .et_pb_gallery_pagination ul li a.active') + ", .wp-pagenavi span.current, .wp-pagenavi a:hover, " + css('.et_pb_contact_submit') + ", .et_password_protected_form .et_submit_button, " + css('.et_pb_bg_layout_light .et_pb_newsletter_button') + ", .nav-single a, .posted_in a, " + css('.nav-single a, .posted_in a, .et_pb_contact p input[type=\'checkbox\']:checked + label i:before') + ", .woocommerce .star-rating span::before, " + css('.woocommerce .star-rating span::before') + " { color:" + to + "; }\
+								#et_search_icon:hover, .mobile_menu_bar:before" + css('.mobile_menu_bar:before') + ", .footer-widget h4, #main-footer .footer-widget h4, .et-social-icon a:hover, " + css('.et_pb_sum, .et_pb_pricing li a, .et_overlay:before, .et_pb_member_social_links a:hover, .et_pb_widget li a:hover, .et_pb_bg_layout_light .et_pb_promo_button, .et_pb_bg_layout_light .et_pb_more_button, .et_pb_filterable_portfolio .et_pb_portfolio_filters li a.active, .et_pb_filterable_portfolio .et_pb_portofolio_pagination ul li a.active, .et_pb_gallery .et_pb_gallery_pagination ul li a.active') + ", .wp-pagenavi span.current, .wp-pagenavi a:hover, " + css('.et_pb_contact_submit') + ", .et_password_protected_form .et_submit_button, " + css('.et_pb_bg_layout_light .et_pb_newsletter_button') + ", .nav-single a, .posted_in a, .tagged_as a, " + css('.nav-single a, .posted_in a, .et_pb_contact p input[type=\'checkbox\']:checked + label i:before') + ", .woocommerce .star-rating span::before, " + css('.woocommerce .star-rating span::before') + " { color:" + to + "; }\
 								.et-search-form, .nav li ul, .et_mobile_menu, " + css('.nav li ul, .et_mobile_menu') + ", .footer-widget li:before, .et_pb_pricing li:before { border-color: " + to + "; }\
 								</style>",
 				style_id = 'style#accent_color';
@@ -2130,14 +2149,19 @@
 		value.bind( function( to ) {
 			et_maybe_create_secondary_nav();
 
-			var $phone_number = $( '#et-info-phone' );
+			var $info         = $('#et-info');
+			var $phone_number = $('#et-info-phone');
+			var $container    = $('#top-header .container');
 
-			if ( ! $phone_number.length ) {
-				if ( ! $( '#et-info' ).length ) {
-					$( '#top-header .container' ).prepend( '<div id="et-info"></div>' );
+			if (!$phone_number.length) {
+				if (!$info.length && $container.length) {
+					$info = $('<div id="et-info"></div>');
+					$container.prepend($info);
 				}
 
-				$( '#et-info' ).prepend( '<span id="et-info-phone"></span>' );
+				if ($info.length) {
+					$info.prepend( '<span id="et-info-phone"></span>' );
+				}
 
 				$phone_number = $( '#et-info-phone' );
 			}
@@ -2155,14 +2179,19 @@
 		value.bind( function( to ) {
 			et_maybe_create_secondary_nav();
 
-			var $email = $( '#et-info-email' );
+			var $info      = $('#et-info');
+			var $email     = $('#et-info-email');
+			var $container = $('#top-header .container');
 
-			if ( ! $email.length ) {
-				if ( ! $( '#et-info' ).length ) {
-					$( '#top-header .container' ).append( '<div id="et-info"></div>' );
+			if (!$email.length) {
+				if (!$info.length && $container.length) {
+					$info = $('<div id="et-info"></div>');
+					$container.prepend($info);
 				}
 
-				$( '#et-info' ).append( '<span id="et-info-email"></span>' );
+				if ($info.length) {
+					$info.append('<span id="et-info-email"></span>');
+				}
 
 				$email = $( '#et-info-email' );
 			}
@@ -2640,10 +2669,14 @@
 	wp.customize( 'et_divi[all_buttons_text_color]', function( value ) {
 		value.bind( function( to ) {
 			var	$button_style = "<style id='buttons_text_color'> body.et_pb_button_helper_class #page-container .et_pb_button, body.et_pb_button_helper_class " + css('.et_pb_button') + ", \
-									.woocommerce.et_pb_button_helper_class a.button.alt, .woocommerce-page.et_pb_button_helper_class a.button.alt, .woocommerce.et_pb_button_helper_class button.button.alt, .woocommerce-page.et_pb_button_helper_class button.button.alt, .woocommerce.et_pb_button_helper_class input.button.alt, .woocommerce-page.et_pb_button_helper_class input.button.alt, .woocommerce.et_pb_button_helper_class #respond input#submit.alt, .woocommerce-page.et_pb_button_helper_class #respond input#submit.alt, .woocommerce.et_pb_button_helper_class #content input.button.alt, .woocommerce-page.et_pb_button_helper_class #content input.button.alt,\
+									.woocommerce.et_pb_button_helper_class a.button.alt, .woocommerce-page.et_pb_button_helper_class a.button.alt, .woocommerce.et_pb_button_helper_class button.button.alt, .woocommerce.et_pb_button_helper_class button.button.alt.disabled, .woocommerce-page.et_pb_button_helper_class button.button.alt, .woocommerce-page.et_pb_button_helper_class button.button.alt.disabled, .woocommerce.et_pb_button_helper_class input.button.alt, .woocommerce-page.et_pb_button_helper_class input.button.alt, .woocommerce.et_pb_button_helper_class #respond input#submit.alt, .woocommerce-page.et_pb_button_helper_class #respond input#submit.alt, .woocommerce.et_pb_button_helper_class #content input.button.alt, .woocommerce-page.et_pb_button_helper_class #content input.button.alt,\
 									.woocommerce.et_pb_button_helper_class a.button, .woocommerce-page.et_pb_button_helper_class a.button, .woocommerce.et_pb_button_helper_class button.button, .woocommerce-page.et_pb_button_helper_class button.button, .woocommerce.et_pb_button_helper_class input.button, .woocommerce-page.et_pb_button_helper_class input.button, .woocommerce.et_pb_button_helper_class #respond input#submit, .woocommerce-page.et_pb_button_helper_class #respond input#submit, .woocommerce.et_pb_button_helper_class #content input.button, .woocommerce-page.et_pb_button_helper_class #content input.button { color:" + to + ";}\
 								</style>",
 				style_id = 'style#buttons_text_color';
+
+			if ( ! to ) {
+				$style_content = '';
+			}
 
 			et_customizer_update_styles( style_id, $button_style );
 		} );
@@ -2651,7 +2684,7 @@
 
 	wp.customize( 'et_divi[all_buttons_bg_color]', function( value ) {
 		value.bind( function( to ) {
-			var	$button_style = '<style id="buttons_bg_color">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce-page button.button.alt, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { background:' + to + ';}</style>',
+			var	$button_style = '<style id="buttons_bg_color">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce button.button.alt.disabled, .woocommerce-page button.button.alt, .woocommerce-page button.button.alt.disabled, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { background:' + to + ';}</style>',
 				style_id = 'style#buttons_bg_color';
 
 			et_customizer_update_styles( style_id, $button_style );
@@ -2660,7 +2693,7 @@
 
 	wp.customize( 'et_divi[all_buttons_border_width]', function( value ) {
 		value.bind( function( to ) {
-			var	$button_style = '<style id="buttons_border_width">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce-page button.button.alt, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { border-width:' + to + 'px !important; }</style>',
+			var	$button_style = '<style id="buttons_border_width">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce button.button.alt.disabled, .woocommerce-page button.button.alt, .woocommerce-page button.button.alt.disabled, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { border-width:' + to + 'px !important; }</style>',
 				style_id = 'style#buttons_border_width';
 
 			et_customizer_update_styles( style_id, $button_style );
@@ -2669,7 +2702,7 @@
 
 	wp.customize( 'et_divi[all_buttons_border_color]', function( value ) {
 		value.bind( function( to ) {
-			var	$button_style = '<style id="buttons_border_color">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce-page button.button.alt, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { border-color:' + to + ';}</style>',
+			var	$button_style = '<style id="buttons_border_color">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce button.button.alt.disabled, .woocommerce-page button.button.alt, .woocommerce-page button.button.alt.disabled, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { border-color:' + to + ';}</style>',
 				style_id = 'style#buttons_border_color';
 
 			et_customizer_update_styles( style_id, $button_style );
@@ -2678,7 +2711,7 @@
 
 	wp.customize( 'et_divi[all_buttons_border_radius]', function( value ) {
 		value.bind( function( to ) {
-			var	$button_style = '<style id="buttons_border_radius">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce-page button.button.alt, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { border-radius:' + to + 'px;}</style>',
+			var	$button_style = '<style id="buttons_border_radius">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce button.button.alt.disabled, .woocommerce-page button.button.alt, .woocommerce-page button.button.alt.disabled, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { border-radius:' + to + 'px;}</style>',
 				style_id = 'style#buttons_border_radius';
 
 			et_customizer_update_styles( style_id, $button_style );
@@ -2688,7 +2721,7 @@
 	wp.customize( 'et_divi[all_buttons_font_style]', function( value ) {
 		value.bind( function( to ) {
 			var styles = et_set_font_styles( to, '' ),
-				$button_style = '<style id="buttons_font_style">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce-page button.button.alt, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button {' + styles + '}</style>',
+				$button_style = '<style id="buttons_font_style">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce button.button.alt.disabled, .woocommerce-page button.button.alt, .woocommerce-page button.button.alt.disabled, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button {' + styles + '}</style>',
 				style_id = 'style#buttons_font_style';
 
 			et_customizer_update_styles( style_id, $button_style );
@@ -2794,12 +2827,16 @@
 		} );
 	} );
 
-	var buttons_hover_selector = 'body #page-container .et_pb_button:hover, body ' + css('.et_pb_button:hover') + ', .woocommerce a.button.alt:hover, .woocommerce-page a.button.alt:hover, .woocommerce button.button.alt:hover, .woocommerce-page button.button.alt:hover, .woocommerce input.button.alt:hover, .woocommerce-page input.button.alt:hover, .woocommerce #respond input#submit.alt:hover, .woocommerce-page #respond input#submit.alt:hover, .woocommerce #content input.button.alt:hover, .woocommerce-page #content input.button.alt:hover, .woocommerce a.button:hover, .woocommerce-page a.button:hover, .woocommerce button.button:hover, .woocommerce-page button.button:hover, .woocommerce input.button:hover, .woocommerce-page input.button:hover, .woocommerce #respond input#submit:hover, .woocommerce-page #respond input#submit:hover, .woocommerce #content input.button:hover, .woocommerce-page #content input.button:hover';
+	var buttons_hover_selector = 'body #page-container .et_pb_button:hover, body ' + css('.et_pb_button:hover') + ', .woocommerce a.button.alt:hover, .woocommerce-page a.button.alt:hover, .woocommerce button.button.alt:hover, .woocommerce button.button.alt.disabled:hover, .woocommerce-page button.button.alt:hover, .woocommerce-page button.button.alt.disabled:hover, .woocommerce input.button.alt:hover, .woocommerce-page input.button.alt:hover, .woocommerce #respond input#submit.alt:hover, .woocommerce-page #respond input#submit.alt:hover, .woocommerce #content input.button.alt:hover, .woocommerce-page #content input.button.alt:hover, .woocommerce a.button:hover, .woocommerce-page a.button:hover, .woocommerce button.button:hover, .woocommerce-page button.button:hover, .woocommerce input.button:hover, .woocommerce-page input.button:hover, .woocommerce #respond input#submit:hover, .woocommerce-page #respond input#submit:hover, .woocommerce #content input.button:hover, .woocommerce-page #content input.button:hover';
 
 	wp.customize( 'et_divi[all_buttons_text_color_hover]', function( value ) {
 		value.bind( function( to ) {
 			var	$button_style = '<style id="buttons_text_color_hover">' + buttons_hover_selector + ' { color: ' + to + ' !important; } </style>',
 				style_id = 'style#buttons_text_color_hover';
+
+			if ( ! to ) {
+				$button_style = '';
+			}
 
 			et_customizer_update_styles( style_id, $button_style );
 		} );
@@ -2834,7 +2871,7 @@
 
 	wp.customize( 'et_divi[all_buttons_spacing]', function( value ) {
 		value.bind( function( to ) {
-			var	$button_style = '<style id="buttons_spacing">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce-page button.button.alt, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { letter-spacing: ' + to + 'px; } </style>',
+			var	$button_style = '<style id="buttons_spacing">body #page-container .et_pb_button, body ' + css('.et_pb_button') + ', .woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce button.button.alt.disabled, .woocommerce-page button.button.alt, .woocommerce-page button.button.alt.disabled, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button { letter-spacing: ' + to + 'px; } </style>',
 				style_id = 'style#buttons_spacing';
 
 			et_customizer_update_styles( style_id, $button_style );

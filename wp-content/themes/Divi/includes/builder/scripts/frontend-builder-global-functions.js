@@ -1,5 +1,44 @@
 /*! ET frontend-builder-global-functions.js */
 (function($){
+	// Modification of underscore's _.debounce()
+	// Underscore.js 1.8.3
+	// http://underscorejs.org
+	// (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+	// Underscore may be freely distributed under the MIT license.
+	window.et_pb_debounce = function(func, wait, immediate) {
+		var timeout, args, context, timestamp, result;
+
+		var now = Date.now || new Date().getTime();
+
+		var later = function() {
+			var last = now - timestamp;
+
+			if (last < wait && last >= 0) {
+				timeout = setTimeout(later, wait - last);
+			} else {
+				timeout = null;
+				if (!immediate) {
+					result = func.apply(context, args);
+					if (!timeout) context = args = null;
+				}
+			}
+		};
+
+		return function() {
+			context = this;
+			args = arguments;
+			timestamp = now;
+			var callNow = immediate && !timeout;
+			if (!timeout) timeout = setTimeout(later, wait);
+			if (callNow) {
+				result = func.apply(context, args);
+				context = args = null;
+			}
+
+			return result;
+		};
+	};
+
 	window.et_pb_smooth_scroll = function( $target, $top_section, speed, easing ) {
 		var $window_width = $( window ).width();
 
@@ -64,6 +103,7 @@
 
 			$cloned_nav = $this_menu.find('> ul');
 			$cloned_nav.find('.menu_slide').remove();
+			$cloned_nav.find('.et_pb_menu__logo-slot').remove();
 			$cloned_nav.find('li:first').addClass('et_first_mobile_item');
 
 			$cloned_nav.find( 'a' ).on( 'click', function(){
@@ -71,7 +111,14 @@
 			} );
 
 			if ( 'no_click_event' !== menu_click_event ) {
+				if (isBuilder) {
+					$this_menu.off('click');
+				}
+
 				$this_menu.on( 'click', '.mobile_menu_bar', function(){
+					// Close all other open menus.
+					$('.mobile_nav.opened .mobile_menu_bar').not($(this)).trigger('click');
+
 					if ( $this_menu.hasClass('closed') ){
 						$this_menu.removeClass( 'closed' ).addClass( 'opened' );
 						$cloned_nav.stop().slideDown( 500 );
@@ -124,25 +171,27 @@
 	};
 
 	window.et_fix_pricing_currency_position = function( $pricing_table ) {
-		var $all_pricing_tables = typeof $pricing_table !== 'undefined' ? $pricing_table : $( '.et_pb_pricing_table' );
+		setTimeout(function () {
+			var $all_pricing_tables = typeof $pricing_table !== 'undefined' ? $pricing_table : $( '.et_pb_pricing_table' );
 
-		if ( ! $all_pricing_tables.length ) {
-			return;
-		}
-
-		$all_pricing_tables.each( function() {
-			var $this_table = $( this ),
-				$price_container = $this_table.find( '.et_pb_et_price' ),
-				$currency = $price_container.length ? $price_container.find( '.et_pb_dollar_sign' ) : false,
-				$price = $price_container.length ? $price_container.find( '.et_pb_sum' ) : false;
-
-			if ( ! $currency || ! $price ) {
+			if ( ! $all_pricing_tables.length ) {
 				return;
 			}
 
-			// adjust the margin of currency sign to make sure it doesn't overflow the price
-			$currency.css( { 'marginLeft' : - $currency.width() + 'px' } );
-		});
+			$all_pricing_tables.each( function() {
+				var $this_table = $( this ),
+					$price_container = $this_table.find( '.et_pb_et_price' ),
+					$currency = $price_container.length ? $price_container.find( '.et_pb_dollar_sign' ) : false,
+					$price = $price_container.length ? $price_container.find( '.et_pb_sum' ) : false;
+
+				if ( ! $currency || ! $price ) {
+					return;
+				}
+
+				// adjust the margin of currency sign to make sure it doesn't overflow the price
+				$currency.css( { 'marginLeft' : - $currency.width() + 'px' } );
+			});
+		}, 1);
 	};
 
 	window.et_pb_set_responsive_grid = function( $grid_items_container, single_item_selector ) {
@@ -390,4 +439,129 @@
 			$section.addClass(sticky_mobile_class);
 		}
 	};
+
+	/**
+	 * Inject a <li> element in the middle of a menu for the purposes of the menu module's
+	 * inline centered logo style.
+	 *
+	 * @since 4.0
+	 *
+	 * @param {object} menu
+	 *
+	 * @returns {object|null}
+	 */
+	window.et_pb_menu_inject_inline_centered_logo = function (menu) {
+		var $listItems = $(menu).find('nav > ul > li');
+		var index      = Math.round($listItems.length / 2);
+		var li         = window.et_pb_menu_inject_item(menu, index, true);
+
+		if (li) {
+			$(li).addClass('et_pb_menu__logo-slot');
+		}
+
+		return li;
+	};
+
+	/**
+	 * Inject a <li> element at the start of a menu for the purposes of the menu module's
+	 * additional icons.
+	 *
+	 * @since 4.0
+	 *
+	 * @param {object} menu
+	 * @param {number} index
+	 * @param {boolean} fromTheBeginning
+	 *
+	 * @returns {object|null}
+	 */
+	window.et_pb_menu_inject_item = function (menu, index, fromTheBeginning) {
+		fromTheBeginning = undefined === fromTheBeginning ? true : fromTheBeginning;
+		index            = Math.max(index, 0);
+		var $list        = $(menu).find('nav > ul:first');
+
+		if (0 === $list.length) {
+			return null;
+		}
+
+		var $listItems   = $list.find('> li');
+		var $li          = $('<li></li>');
+
+		if (0 === $listItems.length) {
+			$list.append($li);
+		} else {
+			var action   = fromTheBeginning ? 'before' : 'after';
+			var $sibling = fromTheBeginning
+				? $listItems.eq(index)
+				: $listItems.eq(($listItems.length - 1) - index);
+
+			if (0 === $sibling.length) {
+				action   = fromTheBeginning ? 'after' : 'before';
+				$sibling = fromTheBeginning ? $listItems.last() : $listItems.first();
+			}
+
+			$sibling[action]($li);
+		}
+
+		return $li.get(0);
+	};
+
+	/**
+	 * Reposition menu module dropdowns.
+	 * This is necessary due to mega menus relying on an upper wrapper's width but
+	 * still needing to be position relative to their parent li.
+	 *
+	 * @since 4.0
+	 *
+	 * @returns {void}
+	 */
+	window.et_pb_reposition_menu_module_dropdowns = et_pb_debounce(function (menus) {
+		var $menus = menus ? $(menus) : $('.et_pb_menu, .et_pb_fullwidth_menu');
+
+		$menus.each(function () {
+			var $row = $(this).find('.et_pb_row:first');
+
+			if (0 === $row.length) {
+				return true; // = continue.
+			}
+
+			var offset      = $row.offset().top;
+			var moduleClass = $(this).attr('class').replace(/^.*?(et_pb(?:_fullwidth)?_menu_\d+[^\s]*).*$/i, '$1');
+			var isUpwards   = $(this).find('.et_pb_menu__menu ul:first').hasClass('upwards');
+			var selector    = '.et_pb_menu__menu > nav > ul > li.mega-menu.menu-item-has-children';
+			var css         = '';
+
+			$(this).find(selector).each(function () {
+				var $li      = $(this);
+				var liId     = $li.attr('class').replace(/^.*?(menu-item-\d+).*$/i, '$1');
+				var selector = '.' + moduleClass + ' li.' + liId + ' > .sub-menu';
+
+				if (isUpwards) {
+					// Offset by 1px to ensure smooth mouse hover.
+					var linkOffset = Math.floor(offset + $row.outerHeight() - $li.offset().top) - 1;
+
+					css += selector + '{ bottom: ' + linkOffset.toString() + 'px !important; }';
+				} else {
+					// Offset by 1px to ensure smooth mouse hover.
+					var linkOffset = Math.floor($li.offset().top + $li.outerHeight() - offset) - 1;
+
+					css += selector + '{ top: ' + linkOffset.toString() + 'px !important; }';
+				}
+			});
+
+			var $style = $('style.et-menu-style-' + moduleClass + ':first');
+
+			if (0 === $style.length) {
+				$style = $('<style></style>');
+				$style.addClass('et-menu-style');
+				$style.addClass('et-menu-style-' + moduleClass);
+				$style.appendTo($('head'));
+			}
+
+			var oldCss = $style.html();
+
+			if (css !== oldCss) {
+				$style.html(css);
+			}
+		});
+	}, 200);
 })(jQuery);

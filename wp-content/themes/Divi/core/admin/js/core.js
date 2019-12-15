@@ -68,6 +68,10 @@
 			} );
 
 			$( document ).on( 'click', '[data-et-core-modal="close"], .et-core-modal-overlay', function( e ) {
+				if ($(this).data('et-core-disable-closing')) {
+					return;
+				}
+
 				$this.modalClose( e, this );
 			} );
 

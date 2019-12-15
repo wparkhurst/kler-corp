@@ -465,7 +465,7 @@
 					}
 				},
 				clear: function() {
-					control.setting.set( false );
+					control.setting.set( '' );
 				}
 			});
 

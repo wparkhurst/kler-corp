@@ -1,3 +1,7 @@
+function et_failure_notice_get_page_url() {
+  return jQuery( '#wp-admin-bar-et-disable-visual-builder a' ).attr('href');
+}
+
 jQuery( 'body' ).on( 'click', '.et_builder_increase_memory', function() {
 	var $this_button = jQuery(this);
 
@@ -22,16 +26,21 @@ jQuery( 'body' ).on( 'click', '.et_builder_increase_memory', function() {
 } );
 
 jQuery( 'body' ).on( 'click', '.et-builder-timeout .et-core-modal-action', function() {
-	location.reload();
-
-	return false;
+  location.reload();
+  return false;
 } );
 
 // disable Visual Builder on Close button
 jQuery( 'body' ).on( 'click', '.et-builder-timeout .et-core-modal-close, .et-builder-timeout', function() {
-
-	var page_href = jQuery( '#wp-admin-bar-et-disable-visual-builder a' ).attr('href');
-	location.assign( page_href );
-
-	return false;
+  location.assign(et_failure_notice_get_page_url());
+  return false;
 } );
+
+
+// disable Visual Builder on Close button
+jQuery('body').on('click', '.et-theme-builder-no-post-content .et-core-modal-close, .et-theme-builder-no-post-content', function(e) {
+  if (!jQuery(e.target).is('.et-core-modal-action')) {
+    e.preventDefault();
+    location.assign(et_failure_notice_get_page_url());
+  }
+});

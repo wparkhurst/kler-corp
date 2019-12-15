@@ -39,6 +39,7 @@ body.rtl .et-bfb-optin-cta__button {float: left;}
 #et_pb_layout.postbox {border: none;}
 #et_pb_layout .hndle {font-weight: 600 !important;font-size: 18px;color: #fff;background-color: #6c2eb9;padding: 19px 70px !important;border-bottom: 0;line-height: 18px;position: relative;border-radius: 3px 3px 0 0;cursor: default;font-family: "Open Sans",Helvetica,Roboto,Arial,sans-serif;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;}
 #et_pb_layout .hndle:before {font-family: "etbuilder";content: "<";display: block;position: absolute;left: 26px;top: 14px;font-size: 28px;speak: none;font-weight: normal;font-variant: normal;text-transform: none;line-height: 1;-webkit-font-smoothing: antialiased;}
+body.rtl #et_pb_layout .hndle:before {left: auto;right: 26px;}
 body.post-type-view-template #et_pb_layout {margin-top: 50px !important;}
 label[for="et_pb_layout-hide"] {display: none;}
 @keyframes et_pb_fade_in_small {0% {opacity: 0;}
