@@ -6,6 +6,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 	window.et_calculating_scroll_position = false;
 	window.et_side_nav_links_initialized  = false;
 
+	var top_window  = isBuilder ? ET_Builder.Frames.top : window;
+
 	var $et_pb_post_fullwidth = $( '.single.et_pb_pagebuilder_layout.et_full_width_page' ),
 		et_is_mobile_device = navigator.userAgent.match( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/ ),
 		et_is_ipad = navigator.userAgent.match( /iPad/ ),
@@ -248,7 +250,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 		function et_change_primary_nav_position( delay ) {
 			setTimeout( function() {
 				var $body = $('body'),
-					$wpadminbar = isBuilder ? window.top.jQuery('#wpadminbar') : $('#wpadminbar'),
+					$wpadminbar = isBuilder ? top_window.jQuery('#wpadminbar') : $('#wpadminbar'),
 					$top_header = $( '#top-header' ),
 					et_primary_header_top = 0;
 
@@ -256,7 +258,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					var adminbarHeight = $wpadminbar.innerHeight();
 
 					// Adjust admin bar height for builder's preview mode zoom since admin bar is rendered on top window
-					if (isBuilder && window.top.jQuery('html').is('.et-fb-preview--zoom:not(.et-fb-preview--desktop)')) {
+					if (isBuilder && top_window.jQuery('html').is('.et-fb-preview--zoom:not(.et-fb-preview--desktop)')) {
 						adminbarHeight = adminbarHeight * 2;
 					}
 
@@ -463,8 +465,25 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				$wooCommerceNotice.attr('data-position-set', 'yes');
 			}
 
-			// Specific adjustment required for transparent nav + not vertical nav
-			if (window.et_is_transparent_nav && !window.et_is_vertical_nav) {
+			// Specific adjustment required for transparent nav + not vertical nav + (not hidden nav
+			// OR hidden nav but document height is shorter than "viewport" height)
+			// NOTES:
+			// 1. hidden nav: nav is initially hidden then appears as the window is scrolled)
+			// 2. in hidden nav, nav is displayed as window is scrolled. If document height is
+			//    shorter than viewport, vertical scroll doesn't exist and nav is directly rendered.
+			//    Thus, transparent nav adjustment need to be applied if body is shorter than window
+			// 3. Hidden nav only works on desktop breakpoint. Nav is always displayed on tablet
+			//    and smaller breakpoints
+			// 4. "viewport" height calculation needs to be identical with viewport calculation used
+			//    at `et_hide_nav_transform()` to make sure that when nav is displayed due to short
+			//    document height, the padding gets added
+			var bodyHeight                = $(document).height();
+			var viewportHeight            = $(window).height() + et_header_height + 200;
+			var isBodyShorterThanViewport = viewportHeight > bodyHeight;
+			var isDesktop                 = parseInt($(window).width()) > 980;
+			var isHideNavDesktop          = isDesktop && et_hide_nav;
+
+			if (window.et_is_transparent_nav && !window.et_is_vertical_nav && (!isHideNavDesktop || isBodyShorterThanViewport)) {
 
 				if (!$('body').hasClass('et-bfb')) {
 					// Add class for first row for custom section padding purpose
@@ -910,7 +929,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				et_container_actual_width   = !has_container ? 0 : et_container_width_in_pixel ? parseInt( $et_container.width() ) : ( parseInt( (parseInt( $et_container.width() ) / 100).toFixed(0) ) * window_width ), // $et_container.width() doesn't recognize pixel or percentage unit. It's our duty to understand what it returns and convert it properly
 				containerWidthChanged       = $et_container.length && et_container_previous_width !== et_container_actual_width,
 				$slide_menu_container       = $( '.et_slide_in_menu_container' ),
-				$adminbar                   = isBuilder ? window.top.jQuery('#wpadminbar') : $('#wpadminbar'),
+				$adminbar                   = isBuilder ? top_window.jQuery('#wpadminbar') : $('#wpadminbar'),
 				is_rtl                      = $( 'body' ).hasClass( 'rtl' ),
 				page_container_margin;
 
@@ -1053,11 +1072,15 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 
 				if ( et_is_fixed_nav ) {
+					// Changing waypoint selector to first section's row / module when transparent
+					// nav is used only valid if the first section position is on offset top = 0
+					// (or 32 when admin bar exist) to avoid `et-fixed-nav` classname being added
+					// too late when the window is scrolled too way down
+					var firstRowOffsetTop    = $et_pb_first_row.length > 0 ? $et_pb_first_row.offset().top : 0;
+					var maxFirstRowOffsetTop = $('#wpadminbar').length ? $('#wpadminbar').height() : 0;
+					var isFirstRowOnTop      = firstRowOffsetTop <= maxFirstRowOffsetTop;
 
-					// We don't want product pages with divi-builder to trigger fixed navigation
-					// based on builder row/module position
-					if (window.et_is_transparent_nav && ! (window.et_is_vertical_nav || $('body.woocommerce.single-product').length) && $et_pb_first_row.length) {
-
+					if (isFirstRowOnTop && window.et_is_transparent_nav && !window.et_is_vertical_nav && $et_pb_first_row.length) {
 						// Fullscreen section at the first row requires specific adjustment
 						if ($et_pb_first_row.is('.et_pb_fullwidth_section')) {
 							$waypoint_selector = $et_pb_first_row.children('.et_pb_module:visible:first');
@@ -1072,7 +1095,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						if (! $waypoint_selector.length) {
 							$waypoint_selector = $('body.et_pb_pagebuilder_layout .et_pb_module:visible:first');
 						}
-					} else if (window.et_is_transparent_nav && ! window.et_is_vertical_nav && $et_main_content_first_row.length) {
+					} else if (isFirstRowOnTop && window.et_is_transparent_nav && ! window.et_is_vertical_nav && $et_main_content_first_row.length) {
 						$waypoint_selector = $('#content-area');
 					} else {
 						$waypoint_selector = $('#main-content');
@@ -1661,7 +1684,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 		if (isBuilder) {
 			var $menu = jQuery('.et_header_style_fullscreen .et_slide_in_menu_container.et_pb_fullscreen_menu_opened');
 			if ($menu.length > 0) {
-				var height = jQuery(window.top).height();
+				var height = jQuery(top_window).height();
 				// Account for padding
 				height -= parseInt($menu.css('padding-top'), 10);
 				// and AdminBar
@@ -1728,7 +1751,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
   // Override row selector in VB
   $et_window.on('et_fb_init', function() {
-    var wp = window.top.wp;
+    var wp = top_window.wp;
     if (wp && wp.hooks && wp.hooks.addFilter) {
       var replacement = window.DIVI.row_selector;
       wp.hooks.addFilter('et.pb.row.css.selector', 'divi.et.pb.row.css.selector', function(selector) {

@@ -109,8 +109,10 @@
 		}, 50);
 	}
 
+	var top_window = (window.Cypress && window) || (window.parent && window.parent.Cypress && window.parent) || window.top || window;
+
 	$(window).on('et_fb_init_app_after resize et_fb_toolbar_change', pageSettingsBarAdjustment);
-	$(window.top).on('et-preview-animation-complete et-bfb-modal-snapped', pageSettingsBarAdjustment);
+	$(top_window).on('et-preview-animation-complete et-bfb-modal-snapped', pageSettingsBarAdjustment);
 
 	$('#et_pb_toggle_builder').click(function(event){
 		event.preventDefault();

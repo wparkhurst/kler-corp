@@ -113,32 +113,77 @@
 		},
 
 		maybe_request_font: function( font_name, font_option ) {
-			if ( font_option.val() === 'none' ) return;
-
-			if ( font_option.data( 'standard' ) === 'on' ) {
+			if ('none' === font_option.val()) {
 				return;
 			}
 
-			var $head = this.frontend_customizer ? $('head') : $( "#customize-preview iframe" ).contents().find('head');
-			var font_class = this.fontname_to_class( font_name );
+			if ('on' === font_option.data('standard')) {
+				return;
+			}
+
+			var $head      = this.frontend_customizer ? $('head') : $('#customize-preview iframe').contents().find('head');
+			var font_class = this.fontname_to_class(font_name);
 
 			// process custom user fonts
-			if ( typeof et_google_fonts_data.user_fonts !== 'undefined' && typeof et_google_fonts_data.user_fonts[ font_name ] !== 'undefined' ) {
-				if ( $head.find( 'style#' + font_class ).length ) {
+			if ('undefined' !== typeof et_google_fonts_data.user_fonts && 'undefined' !== typeof et_google_fonts_data.user_fonts[font_name]) {
+				if ($head.find('style#' + font_class).length > 0) {
 					return;
 				}
 
-				$head.append( '<style id="' + font_class + '">@font-face{font-family:"' + font_name + '"; src: url(' + et_google_fonts_data.user_fonts[ font_name ]['font_url'] + ');}</style>' );
+				var savedFontFiles = 'undefined' !== typeof et_google_fonts_data.user_fonts[font_name]['font_url'] ? et_google_fonts_data.user_fonts[font_name]['font_url'] : '';
+				var fontSrc        = 'string' === typeof savedFontFiles ? "src: url('" + savedFontFiles + "');" : '';
+		  
+				// generate the @font-face src from the uploaded font files
+				// all the font formats have to be added in certain order to provide the best browser support
+				if ('' === fontSrc && 'string' !== typeof savedFontFiles) {
+				  var allFontFiles = {
+					'eot': {
+					  'url'    : 'undefined' !== typeof savedFontFiles['eot'] ? savedFontFiles['eot'] : false,
+					  'format' : 'embedded-opentype',
+					},
+					'woff2': {
+					  'url'    : 'undefined' !== typeof savedFontFiles['woff2'] ? savedFontFiles['woff2'] : false,
+					  'format' : 'woff2',
+					},
+					'woff': {
+					  'url'    : 'undefined' !== typeof savedFontFiles['woff'] ? savedFontFiles['woff'] : false,
+					  'format' : 'woff',
+					},
+					'ttf': {
+					  'url'    : 'undefined' !== typeof savedFontFiles['ttf'] ? savedFontFiles['ttf'] : false,
+					  'format' : 'truetype',
+					},
+					'otf': {
+					  'url'    : 'undefined' !== typeof savedFontFiles['otf'] ? savedFontFiles['otf'] : false,
+					  'format' : 'opentype',
+					},
+				  };
+		  
+				  if (allFontFiles['eot']['url']) {
+					fontSrc = "src: url('" + allFontFiles['eot']['url'] + "'); src: url('" + allFontFiles['eot']['url'] + "?#iefix') format('embedded-opentype')";
+				  }
+		  
+				  jQuery.each(allFontFiles, function(extension, fontData) {
+					if ('eot' !== extension && fontData.url) {
+					  fontSrc += '' === fontSrc ? 'src: ' : ', ';
+					  fontSrc += "url('" + fontData.url + "') format('" + fontData.format + "')";
+					}
+				  });
+				}
+		  
+				$head.append('<style id="' + font_class + '">@font-face{font-family:"' + font_name + '"; ' +  fontSrc + ';}</style>');
 
 				return;
 			}
 
-			var font_styles = typeof font_option.data( 'parent_styles' ) !== 'undefined' && '' !== font_option.data( 'parent_styles' ) ? ':' + font_option.data( 'parent_styles' ) : '',
-				subset = typeof font_option.data( 'parent_subset' ) !== 'undefined' && '' !== font_option.data( 'parent_subset' ) ? '&' + subset : '';
+			var font_styles = 'undefined' !== typeof font_option.data('parent_styles') && '' !== font_option.data('parent_styles') ? ':' + font_option.data('parent_styles') : '';
+			var subset      = 'undefined' !== typeof font_option.data('parent_subset') && '' !== font_option.data('parent_subset') ? '&' + subset : '';
 
-			if ( $head.find( 'link#' + font_class ).length ) return;
+			if ($head.find('link#' + font_class).length > 0) {
+				return;
+			}
 
-			$head.append( '<link id="' + font_class + '" href="//fonts.googleapis.com/css?family=' + this.convert_to_google_font_name( font_name ) + font_styles + subset + '" rel="stylesheet" type="text/css" />' );
+			$head.append('<link id="' + font_class + '" href="//fonts.googleapis.com/css?family=' + this.convert_to_google_font_name(font_name) + font_styles + subset + '" rel="stylesheet" type="text/css" />');
 		},
 
 		apply_font: function( font_name, font_option ) {

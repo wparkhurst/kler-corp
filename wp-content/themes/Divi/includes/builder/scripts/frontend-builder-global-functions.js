@@ -1,5 +1,7 @@
 /*! ET frontend-builder-global-functions.js */
 (function($){
+	var isBlockLayoutPreview = $('body').hasClass('et-block-layout-preview');
+
 	// Modification of underscore's _.debounce()
 	// Underscore.js 1.8.3
 	// http://underscorejs.org
@@ -148,8 +150,8 @@
 		});
 	};
 
-	window.et_fix_fullscreen_section = function() {
-		var $et_window = $(window);
+	window.et_fix_fullscreen_section = function () {
+		var $et_window = isBlockLayoutPreview ? $(window.top) : $(window);
 
 		$( 'section.et_pb_fullscreen' ).each( function(){
 			var $this_section = $( this );

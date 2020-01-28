@@ -5,7 +5,7 @@ window.wp = window.wp || {};
 /**
  * The builder version and product name will be updated by grunt release task. Do not edit!
  */
-window.et_builder_version = '4.0.9';
+window.et_builder_version = '4.2.2';
 window.et_builder_product_name = 'Divi';
 
 ( function($) {
@@ -209,9 +209,9 @@ window.et_builder_product_name = 'Divi';
 					clearInterval( et_pb_templates_interval );
 					return false;
 				}
-				
+
 				et_is_loading_templates = true;
-				
+
 				// calculate the overall requests number to understand when we finish all the requests.
 				et_pb_template_requests_number++;
 
@@ -14232,7 +14232,7 @@ window.et_builder_product_name = 'Divi';
 					var data = $(el).data(key);
 					return _.isArray(data) && _.isObject(data[1]);
 				};
-			
+
 			// Column shouldn't inherit Row values.
 			if (isColumn) {
 				return;

@@ -3,14 +3,20 @@ var isBuilder = 'object' === typeof window.ET_Builder;
  
 /*! ET frontend-builder-scripts.js */
 (function($){
-	var $et_window = $(window);
-	var $et_top_window = isBuilder ? window.top.jQuery(window.top) : $(window);
-	var isTB = $('body').hasClass('et-tb');
-	var isBFB = $('body').hasClass('et-bfb');
-	var isVB = isBuilder && !isBFB;
-	var topWindow = isBuilder ? window.top : window;
+	var top_window               = isBuilder ? ET_Builder.Frames.top : window;
+	var $et_window               = $(window);
+	var isBlockLayoutPreview     = 'undefined' !== typeof window.ETBlockLayoutPreview && $('body').hasClass('et-block-layout-preview');
+	var $fullscreenSectionWindow = isBlockLayoutPreview ? $(window.top) : $(window);
+	var $et_top_window           = isBuilder ? top_window.jQuery(top_window) : $(window);
+	var isTB                     = $('body').hasClass('et-tb');
+	var isBFB                    = $('body').hasClass('et-bfb');
+	var isVB                     = isBuilder && !isBFB;
+	var topWindow                = top_window;
 
 	var isScrollOnAppWindow = function() {
+		if (isBlockLayoutPreview) {
+			return false;
+		}
 		return isVB && ($('html').is('.et-fb-preview--wireframe') || $('html').is('.et-fb-preview--desktop'));
 	};
 
@@ -1414,7 +1420,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 			et_init_audio_modules();
 
-			if ( $et_post_gallery.length ) {
+			if (!isBlockLayoutPreview && $et_post_gallery.length > 0) {
 				// swipe support in magnific popup only if gallery exists
 				var magnificPopup = $.magnificPopup.instance;
 
@@ -1449,7 +1455,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				$et_post_gallery.find( 'a' ).unbind( 'click' );
 			}
 
-			if ($et_lightbox_image.length || isBuilder) {
+			if (!isBlockLayoutPreview && ($et_lightbox_image.length > 0 || isBuilder)) {
 				// prevent attaching of any further actions on click
 				$et_lightbox_image.unbind( 'click' );
 				$et_lightbox_image.bind( 'click' );
@@ -1505,7 +1511,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 			if ($et_pb_fullwidth_portfolio.length || isBuilder) {
 
-				window.et_fullwidth_portfolio_init = function( $the_portfolio ) {
+				window.et_fullwidth_portfolio_init = function($the_portfolio, $callback) {
 					var $portfolio_items = $the_portfolio.find('.et_pb_portfolio_items');
 
 						$portfolio_items.data('items', $portfolio_items.find('.et_pb_portfolio_item').toArray() );
@@ -1551,6 +1557,10 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					} else {
 						// setup fullwidth portfolio grid
 						set_fullwidth_portfolio_columns( $the_portfolio, false );
+					}
+
+					if ('function' === typeof $callback) {
+						$callback();
 					}
 				};
 
@@ -1942,16 +1952,19 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					}
 				};
 
-				window.set_filterable_portfolio_init = function( $the_portfolio ) {
-					var $the_portfolio_items = $the_portfolio.find('.et_pb_portfolio_items'),
-						$left_orientatation = true == $the_portfolio.data( 'rtl' ) ? false : true,
-						all_portfolio_items = $the_portfolio_items.clone(); // cache for all the portfolio items
+				window.set_filterable_portfolio_init = function($the_portfolio, $callback) {
+					var $the_portfolio_items = $the_portfolio.find('.et_pb_portfolio_items');
+					var all_portfolio_items  = $the_portfolio_items.clone(); // cache for all the portfolio items
 
 					$the_portfolio.show();
 					$the_portfolio.find('.et_pb_portfolio_item').addClass('active');
 					$the_portfolio.css('display', 'block');
 
 					set_filterable_grid_items( $the_portfolio );
+
+					if ('function' === typeof $callback) {
+						$callback();
+					}
 
 					$the_portfolio.on('click', '.et_pb_portfolio_filter a', function(e){
 						e.preventDefault();
@@ -2936,7 +2949,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 				var $parallaxWindow = $et_top_window;
 				if (isTB) {
-					$parallaxWindow = window.top.jQuery('#et-fb-app');
+					$parallaxWindow = top_window.jQuery('#et-fb-app');
 				} else if (isScrollOnAppWindow()) {
 					$parallaxWindow = $(window);
 				}
@@ -2944,12 +2957,31 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				var $this = $(this);
 				var element_top = isBuilderModeZoom() ? $this.offset().top / 2 : $this.offset().top;
 				var window_top = $parallaxWindow.scrollTop();
+
+
+				if (isBlockLayoutPreview) {
+					// Preview offset is what is changing on gutenberg due to window scroll
+					// happens on `.edit-post-layout__content`
+					var blockPreviewId   = '#divi-layout-iframe-' + ETBlockLayoutPreview.blockId;
+					var previewOffsetTop = window.top.jQuery(blockPreviewId).offset().top;
+
+					element_top += previewOffsetTop;
+				}
+
 				var y_pos = ( ( ( window_top + $et_top_window.height() ) - element_top ) * 0.3 );
 				var main_position;
+				var $parallax_container;
 
 				main_position = 'translate(0, ' + y_pos + 'px)';
 
-				$this.children('.et_parallax_bg').css( {
+				// handle specific parallax container in VB
+				if ($this.children('.et_parallax_bg_wrap').length > 0) {
+					$parallax_container = $this.children('.et_parallax_bg_wrap').find('.et_parallax_bg');
+				} else {
+					$parallax_container = $this.children('.et_parallax_bg');
+				}
+
+				$parallax_container.css( {
 					'-webkit-transform' : main_position,
 					'-moz-transform'    : main_position,
 					'-ms-transform'     : main_position,
@@ -2967,7 +2999,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				// background while scrolling because the image height is too short. This is required since BFB
 				// tracks parent window scroll event and BFB metabox has offset top to the top window
 				if (isBFB) {
-					bg_height += window.top.jQuery('#et_pb_layout .inside').offset().top;
+					bg_height += top_window.jQuery('#et_pb_layout .inside').offset().top;
 				}
 
 				$this.find('.et_parallax_bg').css( { 'height' : bg_height } );
@@ -2975,8 +3007,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 			// Emulate CSS Parallax (background-attachment: fixed) effect via absolute image positioning
 			window.et_apply_builder_css_parallax = function() {
-				// This callback is for builder only
-				if (!isBuilder) {
+				// This callback is for builder and layout block preview
+				if (!isBuilder && !isBlockLayoutPreview) {
 					return;
 				}
 
@@ -2997,17 +3029,30 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					return;
 				}
 
-				var $parallaxWindow = isTB ? window.top.jQuery('#et-fb-app') : $et_top_window;
+				var isTopWindow             = isBuilder || isTB || isBlockLayoutPreview ? true : false;
+				var topWindow               = isTopWindow ? window.top : window;
+				var $parallaxWindow         = isTopWindow ? top_window.jQuery('#et-fb-app') : $et_top_window;
+				var parallaxWindowScrollTop = $parallaxWindow.scrollTop();
+				var backgroundOffset        = isBFB ? topWindow.jQuery('#et_pb_layout .inside').offset().top : 0;
+				var heightMultiplier        = isBuilderModeZoom() ? 2 : 1;
+				var parentOffset            = $this_parent.offset();
+				var parentOffsetTop         = isBuilderModeZoom() ? parentOffset.top / 2 : parentOffset.top;
 
-				var backgroundOffset = isBFB ? topWindow.jQuery('#et_pb_layout .inside').offset().top : 0;
-				var heightMultiplier = isBuilderModeZoom() ? 2 : 1;
-				var parentOffset = $this_parent.offset();
-				var parentOffsetTop = isBuilderModeZoom() ? parentOffset.top / 2 : parentOffset.top;
+				if (isBlockLayoutPreview) {
+					// Important: in gutenberg, scroll doesn't happen on window; it's here instead
+					$parallaxWindow  = topWindow.jQuery('.edit-post-layout__content');
+
+					// Background offset is relative to block's preview iframe
+					backgroundOffset = topWindow.jQuery('#divi-layout-iframe-' + ETBlockLayoutPreview.blockId).offset().top;
+
+					// Scroll happens on DOM which has fixed positioning. Hence
+					parallaxWindowScrollTop = $parallaxWindow.offset().top;
+				}
 
 				$this_parallax.css({
 					width: $(window).width(),
 					height: $parallaxWindow.innerHeight() * heightMultiplier,
-					top: ($parallaxWindow.scrollTop() - backgroundOffset) - parentOffsetTop,
+					top: (parallaxWindowScrollTop - backgroundOffset) - parentOffsetTop,
 					left: 0 - parentOffset.left,
 					backgroundAttachment: 'scroll'
 				});
@@ -3073,30 +3118,43 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				});
 
 				if ( is_accordion ) {
-					$accordion_active_toggle.find('.et_pb_toggle_content').slideToggle( 700, function() {
-						$accordion_active_toggle.removeClass( 'et_pb_toggle_open' ).addClass('et_pb_toggle_close');
-						$accordion.removeClass( 'et_pb_accordion_toggling' );
+					var accordionCompleteTogglingCallback = function () {
+						$accordion_active_toggle.removeClass('et_pb_toggle_open').addClass(
+							'et_pb_toggle_close');
+						$accordion.removeClass('et_pb_accordion_toggling');
 
 						module_offset = $module.offset();
 
 						// Calculate height of fixed nav
-						if ( $('#wpadminbar').length ) {
+						if ($('#wpadminbar').length) {
 							fixed_header_height += $('#wpadminbar').height();
 						}
 
-						if ( $('#top-header').length ) {
+						if ($('#top-header').length) {
 							fixed_header_height += $('#top-header').height();
 						}
 
-						if ( $('#main-header').length && ! window.et_is_vertical_nav ) {
+						if ($('#main-header').length && !window.et_is_vertical_nav) {
 							fixed_header_height += $('#main-header').height();
 						}
 
 						// Compare accordion offset against window's offset and adjust accordingly
-						if ( ( window_offset_top + fixed_header_height ) > module_offset.top ) {
-							$('html, body').animate({ scrollTop : ( module_offset.top - fixed_header_height - 50 ) });
+						if ((window_offset_top + fixed_header_height) > module_offset.top) {
+							$('html, body').animate({
+								scrollTop: (module_offset.top - fixed_header_height - 50)
+							});
 						}
-					} );
+					}
+
+					// slideToggle collapsing mechanism (display:block, sliding, then display: none)
+					// doesn't work if the DOM is not "visible" (no height / width at all) which can
+					// happen if the accordion item has no content on desktop mode but has in hover
+					if ($accordion_active_toggle.find('.et_pb_toggle_content').is(':visible')) {
+						$accordion_active_toggle.find('.et_pb_toggle_content').slideToggle(700, accordionCompleteTogglingCallback);
+					} else {
+						$accordion_active_toggle.find('.et_pb_toggle_content').hide();
+						accordionCompleteTogglingCallback();
+					}
 				}
 			} );
 
@@ -4803,6 +4861,14 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 										return;
 									}
 
+									// No need to update animated circle counter as soon as it hits
+									// bottom of the page in layout block preview page since layout
+									// block preview page is being rendered in 100% height inside
+									// Block Editor
+									if (isBlockLayoutPreview) {
+										return;
+									}
+
 									$this_counter.data('easyPieChart').update( $this_counter.data('number-value') );
 
 									$this_counter.data( 'PieChartHasLoaded', true );
@@ -5277,11 +5343,12 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 			var fullscreen_section_timeout = {};
 
 			window.et_calc_fullscreen_section = function(event, section) {
-				var isResizing = typeof event === 'object' && event.type === 'resize',
-					$et_window = $(topWindow),
-					$this_section = section || $(this),
-					section_index = $this_section.index('.et_pb_fullscreen'),
-					timeout = isResizing && typeof fullscreen_section_width[section_index] !== 'undefined' && event.target.window_width > fullscreen_section_width[section_index] ? 800 : 0;
+				var isResizing    = typeof event === 'object' && event.type === 'resize';
+				var topWindow     = isBuilder || isBlockLayoutPreview ? window.top : window;
+				var $et_window    = $(topWindow);
+				var $this_section = section || $(this);
+				var section_index = $this_section.index('.et_pb_fullscreen');
+				var timeout       = isResizing && typeof fullscreen_section_width[section_index] !== 'undefined' && event.target.window_width > fullscreen_section_width[section_index] ? 800 : 0;
 
 					fullscreen_section_width[section_index] = $et_window.width();
 
@@ -5290,31 +5357,32 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					}
 
 					fullscreen_section_timeout[section_index] = setTimeout( function() {
-					var $body = $( 'body' ),
-					  has_section = $this_section.length,
-						this_section_index = $this_section.index('.et_pb_fullwidth_header'),
-						this_section_offset = has_section ? $this_section.offset() : {},
-						$header = $this_section.children('.et_pb_fullwidth_header_container'),
-						$header_content = $header.children('.header-content-container'),
-						$header_image = $header.children('.header-image-container'),
-						sectionHeight = topWindow.innerHeight || $et_window.height(),
-						$wpadminbar = topWindow.jQuery('#wpadminbar'),
-						has_wpadminbar = $wpadminbar.length,
-						wpadminbar_height = has_wpadminbar ? $wpadminbar.height() : 0,
-						$top_header = $('#top-header'),
-						has_top_header = $top_header.length,
-						top_header_height = has_top_header ? $top_header.height() : 0,
-						$main_header = $('#main-header'),
-						has_main_header = $main_header.length,
-						main_header_height = has_main_header ? $main_header.outerHeight() : 0,
-						fixed_main_header_height = et_pb_get_fixed_main_header_height(),
-						is_mobile_first_module = 'undefined' !== typeof this_section_offset.top ? this_section_offset.top <= (main_header_height + wpadminbar_height) : false,
-						is_wp_relative_admin_bar = $et_window.width() < 782,
-						is_desktop_view = $et_window.width() > 980,
-						is_tablet_view = $et_window.width() <= 980 && $et_window.width() >= 479,
-						is_phone_view = $et_window.width() < 479,
-						overall_header_height = window.et_is_vertical_nav && is_desktop_view ? wpadminbar_height + top_header_height : wpadminbar_height + top_header_height + main_header_height,
-						is_first_module = 'undefined' !== typeof this_section_offset.top ? this_section_offset.top <= overall_header_height : false;
+						var $body                    = $('body');
+						var $tb_header               = $('.et-l--header:first');
+						var tb_header_height         = $tb_header.length > 0 ? $tb_header.height() : 0;
+						var has_section              = $this_section.length;
+						var this_section_index       = $this_section.index('.et_pb_fullwidth_header');
+						var this_section_offset      = has_section ? $this_section.offset() : {};
+						var $header                  = $this_section.children('.et_pb_fullwidth_header_container');
+						var $header_content          = $header.children('.header-content-container');
+						var $header_image            = $header.children('.header-image-container');
+						var sectionHeight            = topWindow.innerHeight || $et_window.height();
+						var $wpadminbar              = topWindow.jQuery('#wpadminbar');
+						var has_wpadminbar           = $wpadminbar.length;
+						var wpadminbar_height        = has_wpadminbar ? $wpadminbar.height() : 0;
+						var $top_header              = $('#top-header');
+						var has_top_header           = $top_header.length;
+						var top_header_height        = has_top_header ? $top_header.height() : 0;
+						var $main_header             = $('#main-header');
+						var has_main_header          = $main_header.length;
+						var main_header_height       = has_main_header ? $main_header.outerHeight() : 0;
+						var fixed_main_header_height = et_pb_get_fixed_main_header_height();
+						var is_wp_relative_admin_bar = $et_window.width() < 782;
+						var is_desktop_view          = $et_window.width() > 980;
+						var is_tablet_view           = $et_window.width() <= 980 && $et_window.width() >= 479;
+						var is_phone_view            = $et_window.width() < 479;
+						var overall_header_height    = wpadminbar_height + tb_header_height + top_header_height + (window.et_is_vertical_nav && is_desktop_view ? 0 : main_header_height);
+						var is_first_module          = 'undefined' !== typeof this_section_offset.top ? this_section_offset.top <= overall_header_height : false;
 
 					// In case theme stored the onload main-header height as data-attribute
 					if ( $main_header.attr('data-height-onload') ) {
@@ -5417,6 +5485,11 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						sectionHeight -= section_border_bottom_width;
 					}
 
+					// Subtract Theme Builder header layout height from first fullscreen section/header.
+					if (tb_header_height > 0 && 0 === this_section_index) {
+						sectionHeight -= tb_header_height;
+					}
+
 					$this_section.css('min-height', sectionHeight + 'px' );
 					$header.css('min-height', sectionHeight + 'px' );
 
@@ -5492,13 +5565,13 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				clearTimeout(et_calc_fullscreen_section.timeout);
 
 				et_calc_fullscreen_section.timeout = setTimeout(function () {
-					$et_window.off('resize', et_calculate_fullscreen_section_size);
-					$et_window.off('et-pb-header-height-calculated', et_calculate_fullscreen_section_size);
+					$fullscreenSectionWindow.off('resize', et_calculate_fullscreen_section_size);
+					$fullscreenSectionWindow.off('et-pb-header-height-calculated', et_calculate_fullscreen_section_size);
 
-					$et_window.trigger('resize');
+					$fullscreenSectionWindow.trigger('resize');
 
-					$et_window.on('resize', et_calculate_fullscreen_section_size);
-					$et_window.on('et-pb-header-height-calculated', et_calculate_fullscreen_section_size);
+					$fullscreenSectionWindow.on('resize', et_calculate_fullscreen_section_size);
+					$fullscreenSectionWindow.on('et-pb-header-height-calculated', et_calculate_fullscreen_section_size);
 				});
 				// 100ms timeout is set to make sure that the fulls screen section size is calculated
 				// This allows the posibility that in some specific cases this may not be enought
@@ -5506,21 +5579,27 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 			};
 
 			if (!isBuilder) {
-				$et_window.on( 'resize', et_calculate_fullscreen_section_size );
-				$et_window.on( 'et-pb-header-height-calculated', et_calculate_fullscreen_section_size );
+				$fullscreenSectionWindow.on('resize', et_calculate_fullscreen_section_size);
+				$fullscreenSectionWindow.on('et-pb-header-height-calculated', et_calculate_fullscreen_section_size);
 			}
 
 			window.debounced_et_apply_builder_css_parallax = et_pb_debounce(et_apply_builder_css_parallax, 100);
 
 			window.et_pb_parallax_init = function($this_parallax) {
 				var $this_parent = $this_parallax.parent();
+				var topWindow = isBuilder || isBlockLayoutPreview ? window.top : window;
+
+				// handle specific parallax container in VB
+				if ($this_parent.hasClass('et_parallax_bg_wrap')) {
+					$this_parent = $this_parent.parent();
+				}
 
 				if ($this_parallax.hasClass('et_pb_parallax_css')) {
 					// Register faux CSS Parallax effect for builder modes with top window scroll
-					if ($('body').hasClass('et-fb') || isTB) {
+					if ($('body').hasClass('et-fb') || isTB || isBlockLayoutPreview) {
 						$.proxy(et_apply_builder_css_parallax, $this_parent)();
 						if (isTB) {
-							window.top.jQuery('#et-fb-app')
+							top_window.jQuery('#et-fb-app')
 								.on('scroll.etCssParallaxBackground', $.proxy(et_apply_builder_css_parallax, $this_parent))
 								.on('resize.etCssParallaxBackground', $.proxy(window.debounced_et_apply_builder_css_parallax, $this_parent));
 						} else {
@@ -5537,7 +5616,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				$.proxy(et_apply_parallax, $this_parent)();
 
 				if (isTB) {
-					window.top.jQuery('#et-fb-app').on('scroll.etTrueParallaxBackground', $.proxy(et_apply_parallax, $this_parent));
+					top_window.jQuery('#et-fb-app').on('scroll.etTrueParallaxBackground', $.proxy(et_apply_parallax, $this_parent));
 				} else {
 					$(window).on('scroll.etTrueParallaxBackground', $.proxy(et_apply_parallax, $this_parent));
 				}
@@ -5557,6 +5636,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					et_container_width_in_pixel = ( typeof et_container_css_width !== 'undefined' ) ? et_container_css_width.substr( -1, 1 ) !== '%' : '',
 					et_container_actual_width   = ( et_container_width_in_pixel ) ? $et_container.width() : ( ( $et_container.width() / 100 ) * window_width ), // $et_container.width() doesn't recognize pixel or percentage unit. It's our duty to understand what it returns and convert it properly
 					containerWidthChanged       = et_container_width !== et_container_actual_width;
+				var $dividers                   = $('.et_pb_top_inside_divider, .et_pb_bottom_inside_divider');
 
 				et_pb_resize_section_video_bg();
 				et_pb_center_video();
@@ -5660,6 +5740,13 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						window.et_pb_set_responsive_grid($(this), '.et_pb_grid_item');
 					});
 				}
+
+				// Re-apply module divider fix
+				if (!isBuilder && $dividers.length) {
+					$dividers.each(function() {
+						etFixDividerSpacing($(this));
+					});
+				}
 			} );
 
 			function fitvids_slider_fullscreen_init() {
@@ -5737,7 +5824,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 				if ( $.fn.hashchange ) {
 					$(window).hashchange( function(){
-						var hash = window.location.hash.substring(1);
+						var hash = window.location.hash.replace(/[^a-zA-Z0-9-_|]/g, "");
 						process_et_hashchange( hash );
 					});
 					$(window).hashchange();
@@ -5885,7 +5972,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 							}
 						};
 
-						jQuery.ajax({
+						// Ajax request settings
+						var ajaxSettings = {
 							url: href,
 							success: paginate,
 							error: function (page) {
@@ -5894,7 +5982,19 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 									paginate(page.responseText);
 								}
 							}
-						});
+						};
+
+						// Layout block preview is essentially blank page where its layout is passed
+						// via POST. Pass the next page's layout content by shipping it on the ajax
+						// request as POST
+						if (isBlockLayoutPreview) {
+							ajaxSettings.data = {
+								et_layout_block_layout_content: ETBlockLayoutPreview.layoutContent,
+							};
+							ajaxSettings.method = 'POST';
+						}
+
+						jQuery.ajax(ajaxSettings);
 					});
 				}
 
@@ -6353,6 +6453,34 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 		});
 	};
 
+	/**
+	 * Fix unwanted divider spacing (mostly in webkit) when svg image is repeated and the actual
+	 * svg image dimension width is in decimal
+	 *
+	 * @since 4.0.10
+	 *
+	 * @param {object} $divider jQuery object of `.et_pb_top_inside_divider` or `.et_pb_bottom_inside_divider`
+	 */
+	window.etFixDividerSpacing = function ($divider) {
+		// Clear current inline style first so builder's outputted css is retrieved
+		$divider.attr('style', '');
+
+		// Get divider variables
+		var backgroundSize = $divider.css('backgroundSize').split(' ');
+		var horizontalSize = backgroundSize[0];
+		var verticalSize   = backgroundSize[1];
+		var hasValidSizes  = 'string' === typeof horizontalSize && 'string' === typeof verticalSize;
+
+		// Is not having default value + using percentage based value
+		if (hasValidSizes && '100%' !== horizontalSize && '%' === horizontalSize.substr(-1, 1)) {
+			var dividerWidth     = parseFloat($divider.outerWidth());
+			var imageWidth       = (parseFloat(horizontalSize) / 100) * dividerWidth;
+			var backgroundSizePx = parseInt(imageWidth) + 'px ' + verticalSize;
+
+			$divider.css('backgroundSize', backgroundSizePx);
+		}
+	}
+
 	if ( window.et_pb_custom && window.et_pb_custom.is_ab_testing_active && 'yes' === window.et_pb_custom.is_cache_plugin_active ) {
 		// update the window.et_load_event_fired variable to initiate the scripts properly
 		$( window ).load( function() {
@@ -6400,8 +6528,10 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 	$(document).ready(function() {
 		// Hover transition are disabled for section dividers to prevent visual glitches while document is loading,
-		// we can enable them again now.
-		$('.et_pb_top_inside_divider.et-no-transition, .et_pb_bottom_inside_divider.et-no-transition').removeClass('et-no-transition');
+		// we can enable them again now. Also, execute unwanted divider spacing
+		$('.et_pb_top_inside_divider.et-no-transition, .et_pb_bottom_inside_divider.et-no-transition').removeClass('et-no-transition').each(function() {
+			etFixDividerSpacing($(this));
+		});
 
 		// Set a delay just to make sure all modules are ready before we append box shadow container.
 		// Similar approach exists on VB custom CSS output.
@@ -6863,10 +6993,12 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 			};
 		},
 		callbackHandlerDefault: function (data, $target, $source, slug) {
-			var callbackHandlerCustom = et_multi_view.getCallbackHandlerCustom(slug, data, $target);
+			if (slug) {
+				var callbackHandlerCustom = et_multi_view.getCallbackHandlerCustom(slug);
 
-			if (callbackHandlerCustom && typeof callbackHandlerCustom === 'function') {
-				return callbackHandlerCustom(data, $target, $source, slug);
+				if (callbackHandlerCustom && typeof callbackHandlerCustom === 'function') {
+					return callbackHandlerCustom(data, $target, $source, slug);
+				}
 			}
 
 			var updated = {};
@@ -6893,16 +7025,16 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 			return et_multi_view.isEmptyObject(updated) ? false : updated;
 		},
-		callbackHandlerCounter: function (data, $target, $source, slug) {
-			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+		callbackHandlerCounter: function (data, $target, $source) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 
 			if (updated && updated.attrs && updated.attrs.hasOwnProperty('data-width')) {
 				window.et_bar_counters_init($target);
 			}
 		},
-		callbackHandlerNumberCounter: function (data, $target, $source, slug) {
+		callbackHandlerNumberCounter: function (data, $target, $source) {
 			if ($target.hasClass('title')) {
-				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				return et_multi_view.callbackHandlerDefault(data, $target, $source);
 			}
 
 			var attrs = data.attrs || false;
@@ -6930,9 +7062,9 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 			}
 		},
-		callbackHandlerCircleCounter: function (data, $target, $source, slug) {
+		callbackHandlerCircleCounter: function (data, $target, $source) {
 			if (!$target.hasClass('et_pb_circle_counter_inner')) {
-				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				return et_multi_view.callbackHandlerDefault(data, $target, $source);
 			}
 
 			var attrs = data.attrs || false;
@@ -6959,8 +7091,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 			}
 		},
-		callbackHandlerSlider: function (data, $target, $source, slug) {
-			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+		callbackHandlerSlider: function (data, $target, $source) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 
 			if ($target.hasClass('et_pb_module') && updated && updated.classes) {
 				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_arrows') !== -1) {
@@ -6980,8 +7112,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 			}
 		},
-		callbackHandlerPostSlider: function (data, $target, $source, slug) {
-			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+		callbackHandlerPostSlider: function (data, $target, $source) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 
 			if ($target.hasClass('et_pb_module') && updated && updated.classes) {
 				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_arrows') !== -1) {
@@ -7001,8 +7133,8 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 			}
 		},
-		callbackHandlerVideoSlider: function (data, $target, $source, slug) {
-			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+		callbackHandlerVideoSlider: function (data, $target, $source) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 
 			if ($target.hasClass('et_pb_slider') && updated && updated.classes) {
 				if (updated.classes.add && updated.classes.add.indexOf('et_pb_slider_no_arrows') !== -1) {
@@ -7044,9 +7176,9 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 			}
 		},
-		callbackHandlerSliderItem: function (data, $target, $source, slug) {
+		callbackHandlerSliderItem: function (data, $target, $source) {
 			if (!$target.hasClass('et_pb_slide_video') && !$target.is('img')) {
-				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				return et_multi_view.callbackHandlerDefault(data, $target, $source);
 			}
 
 			if ($target.hasClass('et_pb_slide_video')) {
@@ -7080,12 +7212,12 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					};
 
 					if (isVideoNeedUpdate()) {
-						updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+						updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 					}
 				} else if ($contentNew.is('iframe') && $contentOld.is('iframe') && $contentNew.attr('src') !== $contentOld.attr('src')) {
-					updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+					updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 				} else if (($contentNew.hasClass('wp-video') && $contentOld.is('iframe')) || ($contentNew.is('iframe') && $contentOld.hasClass('wp-video'))) {
-					updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+					updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 				}
 
 				if (updated && updated.content) {
@@ -7111,7 +7243,7 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 					}
 				}
 			} else if ($target.is('img')) {
-				var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				var updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 
 				if (updated && updated.attrs && updated.attrs.src) {
 					var $slider = $target.closest('.et_pb_module');
@@ -7127,9 +7259,9 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				}
 			}
 		},
-		callbackHandlerVideo: function (data, $target, $source, slug) {
+		callbackHandlerVideo: function (data, $target, $source) {
 			if ($target.hasClass('et_pb_video_overlay')) {
-				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				return et_multi_view.callbackHandlerDefault(data, $target, $source);
 			}
 
 			var updated = false;
@@ -7163,12 +7295,12 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				};
 
 				if (isVideoNeedUpdate()) {
-					updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+					updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 				}
 			} else if ($contentNew.is('iframe') && $contentOld.is('iframe') && $contentNew.attr('src') !== $contentOld.attr('src')) {
-				updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 			} else if (($contentNew.is('video') && $contentOld.is('iframe')) || ($contentNew.is('iframe') && $contentOld.is('video'))) {
-				updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 			}
 
 			if (updated && updated.content) {
@@ -7179,39 +7311,25 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 
 			return updated;
 		},
-		callbackHandlerBlog: function (data, $target, $source, slug) {
-			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+		callbackHandlerBlog: function (data, $target, $source) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
+			var classesAdded = et_multi_view.getObjectValue(updated, 'classes.add');
 
-			if (updated && updated.classes && updated.classes.add && updated.classes.add.indexOf('et_pb_blog_show_content') !== -1) {
+			if (classesAdded && classesAdded.indexOf('et_pb_blog_show_content') !== -1) {
 				et_reinit_waypoint_modules();
 			}
 		},
-		callbackHandlerTestimonial: function (data, $target, $source, slug) {
-			if (!$source.hasClass('et_pb_testimonial_description_inner')) {
-				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
-			}
-
-			$.each($target.find('.et_pb_testimonial_author').prevAll(), function () {
-				$(this).remove();
-			});
-
-			$target.find('.et_pb_testimonial_author').before($(data.content));
-
-			if (!$source.hasClass('et_multi_view_swapped')) {
-				$source.addClass('et_multi_view_swapped');
-			}
-		},
-		callbackHandlerWooCommerceBreadcrumb: function(data, $target, $source, slug) {
+		callbackHandlerWooCommerceBreadcrumb: function(data, $target, $source) {
 			if (data.content) {
-				return et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+				return et_multi_view.callbackHandlerDefault(data, $target, $source);
 			}
 			if (data.attrs && data.attrs.hasOwnProperty('href')) {
 				var hrefValue = data.attrs['href'];
 				return et_multi_view.updateAttrs({href: hrefValue}, $target, $source);
 			}
 		},
-		callbackHandlerWooCommerceTabs: function(data, $target, $source, slug) {
-			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source, slug + '__faked');
+		callbackHandlerWooCommerceTabs: function(data, $target, $source) {
+			var updated = et_multi_view.callbackHandlerDefault(data, $target, $source);
 
 			if (updated && updated.attrs && updated.attrs.hasOwnProperty('data-include_tabs')) {
 				// Show only the enabled Tabs i.e. Hide all tabs and show as required.
@@ -7266,9 +7384,6 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 				case 'et_pb_blog':
 					return et_multi_view.callbackHandlerBlog;
 
-				case 'et_pb_testimonial':
-					return et_multi_view.callbackHandlerTestimonial;
-
 				case 'et_pb_wc_breadcrumb':
 					return et_multi_view.callbackHandlerWooCommerceBreadcrumb;
 				case 'et_pb_wc_tabs':
@@ -7313,6 +7428,11 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 						// Do nothing, use styles data contexts and updateStyles method instead.
 						break;
 
+					case 'srcset':
+					case 'sizes':
+						// Do nothing, will handle these attributes along with src attribute.
+						break;
+
 					default:
 						if ($target.attr(key) !== value) {
 							$target.attr(key, value);
@@ -7324,8 +7444,19 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 							if ('src' === key) {
 								if (value) {
 									$target.removeClass('et_multi_view_hidden_image');
+
+									if (attrs.srcset && attrs.sizes) {
+										$target.attr('srcset', attrs.srcset);
+										$target.attr('sizes', attrs.sizes);
+									} else {
+										$target.removeAttr('srcset');
+										$target.removeAttr('sizes');
+									}
 								} else {
 									$target.addClass('et_multi_view_hidden_image');
+
+									$target.removeAttr('srcset');
+									$target.removeAttr('sizes');
 								}
 							}
 
@@ -7451,6 +7582,20 @@ var isBuilder = 'object' === typeof window.ET_Builder;
 			}
 
 			return isEmpty;
+		},
+		getObjectValue: function (object, path, defaultValue) {
+			try {
+				var value = $.extend({}, object);
+				var paths = path.split('.');
+
+				for (i = 0; i < paths.length; ++i) {
+					value = value[paths[i]];
+				}
+
+				return value;
+			} catch (error) {
+				return defaultValue;
+			}
 		},
 		tryParseJSON: function (string) {
 			try {

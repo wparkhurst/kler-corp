@@ -1,0 +1,10 @@
+html, body {height: auto !important;}
+.et-block-layout-force-overflow-auto {overflow: auto !important;}
+body.et-block-layout-preview #page-container {padding-top: 0 !important;}
+body.et-block-layout-preview .et_pb_post.et-fb-iframe-ancestor {margin-bottom: 0 !important;padding-bottom: 0 !important;}
+.et-pb-layout-preview-ancestor, .et-pb-layout-preview-ancestor > #et-boc {margin: 0 !important;padding: 0 !important;display: block !important;border: none !important;box-shadow: none !important;float: none !important;background: transparent !important;}
+.et-fb-root-ancestor {width: 100% !important;min-width: 100% !important;margin: 0 !important;}
+.et_divi_builder .et-pb-layout-preview-ancestor > #et-boc {max-width: none !important;width: auto;}
+.et_divi_builder .et-pb-layout-preview-width-correction {max-width: none !important;width: auto !important;}
+.et-pb-layout-preview-ancestor:before, .et-pb-layout-preview-ancestor:after {box-shadow: none !important;background: transparent !important;}
+#block-layout-preview-footer {display: none;}

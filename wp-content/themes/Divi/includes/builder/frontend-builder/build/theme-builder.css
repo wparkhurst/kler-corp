@@ -43,7 +43,7 @@
 @media (max-width:812px) {.et-tb-modal--anchored .et-tb-modal__content {height: auto;}}
 .et-tb-modal-overlay {position: fixed;left: 0;top: 0;width: 100vw;height: 100vh;background: radial-gradient(ellipse at center,#fff 20%,hsla(0,0%,100%,.7) 100%);animation: et-common-fade-in .2s ease;}
 .et-common-tabs-navigation {display: -ms-flexbox;display: flex;background: #7e3bd0;}
-.et-common-tabs-navigation__button {display: block;padding: 13px 26px;border: 0;font-size: 14px;font-weight: 600;line-height: 1;color: #fff;background: #7e3bd0;outline: none;transition: background .2s ease,transform .2s ease,opacity .15s ease;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}
+.et-common-tabs-navigation__button {display: block;padding: 13px 26px;border: 0;font-size: 14px !important;font-weight: 600 !important;line-height: 1 !important;color: #fff !important;background: #7e3bd0;outline: none;transition: background .2s ease,transform .2s ease,opacity .15s ease;cursor: pointer;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;}
 .et-common-tabs-navigation__button:hover {background: #7435c1;}
 .et-common-tabs-navigation__button--active, .et-common-tabs-navigation__button--active:hover {background: #8e42eb;}
 .et-common-tabs-navigation__button svg {fill: #fff;}

@@ -1,0 +1,4 @@
+div.editor-post-title__block .editor-post-title__input {font-family: "Open Sans",Arial,sans-serif;font-size: 30px;color: #333;line-height: 1.7em;font-weight: 500;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;}
+.block-editor-default-block-appender textarea.block-editor-default-block-appender__content, div.editor-styles-wrapper, div.editor-styles-wrapper button, div.editor-styles-wrapper input, div.editor-styles-wrapper select, div.editor-styles-wrapper textarea {font-family: "Open Sans",Arial,sans-serif;font-size: 14px;color: #666;line-height: 1.7em;font-weight: 500;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;}
+.block-editor-default-block-appender textarea.block-editor-default-block-appender__content {color: rgba(14,28,46,.62);}
+.wp-block {max-width: 795px;}
